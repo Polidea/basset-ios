@@ -1,3 +1,4 @@
+from Helpers.converter import Converter
 
 class TestConverter(object):
     @classmethod
@@ -15,4 +16,6 @@ class TestConverter(object):
         """This method is run once after _each_ test method is executed"""
 
     def test_return_true(self):
-        assert 1 != 1
+        converter = Converter("aa", "bb")
+        converter.convert()
+
