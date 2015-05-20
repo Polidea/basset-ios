@@ -21,7 +21,8 @@ class TestConverter(TestCase):
         self.absolute_input_path = os.path.join(self.tempDirPath, self.converterTestsResourcePath)
         self.absolute_output_path = os.path.join(self.tempDirPath, self.converterOutputTestsResourcePath)
 
-    def teardown(self):
+    def tearDown(self):
+        pass
         shutil.rmtree(self.tempDirPath)
 
     def test_set_up(self):

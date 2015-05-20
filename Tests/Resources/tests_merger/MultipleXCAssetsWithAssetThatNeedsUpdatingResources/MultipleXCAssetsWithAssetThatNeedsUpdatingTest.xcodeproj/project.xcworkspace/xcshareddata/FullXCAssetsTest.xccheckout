@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>7281907E-21FB-4D51-B425-537EEE2018E9</string>
+	<key>IDESourceControlProjectName</key>
+	<string>FullXCAssetsTest</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>B7848788A98F497E77F9A3E7D948655B9ABD53DB</key>
+		<string>gitlab.polidea.com:Assets-Studio/iOS-Assets-Studio.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>Tests/Resources/tests_merger/MultipleXCAssetsWithAssetThatNeedsUpdatingResources/FullXCAssetsTest.xcodeproj</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>B7848788A98F497E77F9A3E7D948655B9ABD53DB</key>
+		<string>../../../../../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>gitlab.polidea.com:Assets-Studio/iOS-Assets-Studio.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>111</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>B7848788A98F497E77F9A3E7D948655B9ABD53DB</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>B7848788A98F497E77F9A3E7D948655B9ABD53DB</string>
+			<key>IDESourceControlWCCName</key>
+			<string>iOS-Assets-Studio</string>
+		</dict>
+	</array>
+</dict>
+</plist>
