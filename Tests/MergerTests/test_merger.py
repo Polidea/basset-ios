@@ -3,6 +3,7 @@ import shutil
 import tempfile
 import json
 from unittest import TestCase
+from nose.tools import assert_raises
 
 from Helpers.merger import Merger, NoXCAssetsFoundException, NoDefaultXCAssetFoundException
 
@@ -23,25 +24,22 @@ class TestMerger(TestCase):
     def test_no_xcassets(self):
         shutil.copytree("./Resources/tests_merger/NoXCAssetsTestResources", self.tempDirPath + "/Project")
 
-        merger = Merger("./Assets", "./Project/NoXCAssetsTest/Images.xcassets")
-        merger.merge()
-
-        self.assertRaises(NoXCAssetsFoundException)
+        merger = Merger(self.tempDirPath, "Assets", "Project/NoXCAssetsTest/Images.xcassets")
+        assert_raises(NoXCAssetsFoundException, merger.merge)
 
     def test_multiple_xcassets_no_default(self):
         shutil.copytree("./Resources/tests_merger/MultipleXCAssetsWithoutDefaultTestResources",
                         self.tempDirPath + "/Project")
 
-        merger = Merger("./Assets", "./ProjectMultipleXCAssetsWithoutDefault/Images.xcassets")
-        merger.merge()
+        merger = Merger(self.tempDirPath, "Assets", "ProjectMultipleXCAssetsWithoutDefault/Images.xcassets")
 
-        self.assertRaises(NoDefaultXCAssetFoundException)
+        assert_raises(NoDefaultXCAssetFoundException, merger.merge)
 
     def test_single_asset(self):
         shutil.copytree("./Resources/tests_merger/SingleXCAssetTestResources", self.tempDirPath + "/Project")
         selected_asset_dir = self.tempDirPath + "/SingleXCAssetTestResources/SingleXCAssetsTest/Images.xcassets/"
 
-        merger = Merger("./Assets", "./Project/SingleXCAssetsTest/Images.xcassets")
+        merger = Merger(self.tempDirPath, "Assets", "Project/SingleXCAssetsTest/Images.xcassets")
         merger.merge()
 
         self.check_if_everything_is_correct(selected_asset_dir, None)
@@ -54,7 +52,7 @@ class TestMerger(TestCase):
         selected_asset_dir = self.tempDirPath + "/MultipleXCAssetsIncludingDefaultTestResources/MultipleXCAssetsIncludingDefault/Images.xcassets/"
         secondary_assets_dir = self.tempDirPath + "/MultipleXCAssetsIncludingDefaultTestResources/MultipleXCAssetsIncludingDefault/Secondary.xcassets/"
 
-        merger = Merger("./Assets", "./Project/MultipleXCAssetsIncludingDefault/Images.xcassets")
+        merger = Merger(self.tempDirPath, "Assets", "Project/MultipleXCAssetsIncludingDefault/Images.xcassets")
         merger.merge()
 
         self.check_if_everything_is_correct(selected_asset_dir, None)
@@ -68,7 +66,7 @@ class TestMerger(TestCase):
         selected_asset_dir = self.tempDirPath + "/MultipleXCAssetsWithAssetThatNeedsUpdatingResources/MultipleXCAssetsWithAssetThatNeedsUpdating/Images.xcassets/"
         secondary_assets_dir = self.tempDirPath + "/MultipleXCAssetsWithAssetThatNeedsUpdatingResources/MultipleXCAssetsWithAssetThatNeedsUpdating/Secondary.xcassets/"
 
-        merger = Merger("./Assets", "./Project/MultipleXCAssetsWithAssetThatNeedsUpdating/Images.xcassets")
+        merger = Merger(self.tempDirPath, "Assets", "Project/MultipleXCAssetsWithAssetThatNeedsUpdating/Images.xcassets")
         merger.merge()
 
         self.check_if_everything_is_correct(selected_asset_dir, 1)
