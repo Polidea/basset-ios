@@ -5,9 +5,7 @@ import json
 from unittest import TestCase
 import collections
 from nose.tools import assert_raises
-
 from Helpers.merger import Merger, NoXCAssetsFoundException, NoDefaultXCAssetFoundException
-from Tests.MergerTests.deep_eq import deep_eq
 
 class TestMerger(TestCase):
     temp_dir_path = ""
@@ -72,7 +70,7 @@ class TestMerger(TestCase):
         merger = Merger(self.temp_dir_path, "Assets", selected_asset_dir)
         merger.merge()
 
-        # self.check_if_everything_is_correct(os.path.join(self.temp_dir_path, selected_asset_dir), 1)
+        self.check_if_everything_is_correct(os.path.join(self.temp_dir_path, selected_asset_dir), 1)
 
         expected_dict = {
             "images": [
@@ -112,12 +110,35 @@ class TestMerger(TestCase):
 
         with open(os.path.join(os.path.join(self.temp_dir_path, selected_asset_dir), "test-01.imageset/Contents.json")) as data_file:
             actual_dict = json.load(data_file)
-            self.assertTrue(expected_dict == actual_dict)
+            actual_dict = self.deep_sort(actual_dict)
+            expected_dict = self.deep_sort(expected_dict)
+            self.assertDictEqual(expected_dict, actual_dict)
 
         self.assertTrue(os.path.isdir(secondary_assets_dir))
         self.assertTrue(os.listdir(secondary_assets_dir) == [])
 
     # Helpers-----------------------------------------------------------------------------------------------------------
+
+    def deep_sort(self, obj):
+        """
+        Recursively sort list or dict nested lists
+        """
+
+        if isinstance(obj, dict):
+            _sorted = {}
+            for key in sorted(obj):
+                _sorted[key] = self.deep_sort(obj[key])
+
+        elif isinstance(obj, list):
+            new_list = []
+            for val in obj:
+                new_list.append(self.deep_sort(val))
+            _sorted = sorted(new_list)
+
+        else:
+            _sorted = obj
+
+        return _sorted
 
     def check_if_everything_is_correct(self, selected_asset_dir, file_excluded_from_json_validation_index):
         assets_paths_dict = {
@@ -199,22 +220,10 @@ class TestMerger(TestCase):
             )
 
         with open(json_file_path) as data_file:
-
-            def convert(data):
-                if isinstance(data, basestring):
-                    return str(data)
-                elif isinstance(data, collections.Mapping):
-                    return dict(map(convert, data.iteritems()))
-                elif isinstance(data, collections.Iterable):
-                    return type(data)(map(convert, data))
-                else:
-                    return data
-
-            actual_dict = convert(json.load(data_file))
-
+            actual_dict = json.load(data_file)
+            actual_dict = self.deep_sort(actual_dict)
+            expected_dict = self.deep_sort(expected_dict)
             self.assertDictEqual(expected_dict, actual_dict)
-
-            # self.assertTrue(deep_eq(expected_dict, actual_dict))
 
     def check_if_images_are_copied(self, source_images, destination_directory_path):
         self.assertTrue(os.path.isdir(destination_directory_path))

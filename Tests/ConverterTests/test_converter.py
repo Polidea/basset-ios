@@ -16,7 +16,7 @@ class TestConverter(TestCase):
     def setUp(self):
         self.tempDirPath = tempfile.mkdtemp()
         os.mkdir(os.path.join(self.tempDirPath, self.converterOutputTestsResourcePath))
-        shutil.copytree("./Resources/tests_converter", os.path.join(self.tempDirPath, self.converterTestsResourcePath))
+        shutil.copytree("./Tests/Resources/tests_converter", os.path.join(self.tempDirPath, self.converterTestsResourcePath))
 
         self.absolute_input_path = os.path.join(self.tempDirPath, self.converterTestsResourcePath)
         self.absolute_output_path = os.path.join(self.tempDirPath, self.converterOutputTestsResourcePath)
