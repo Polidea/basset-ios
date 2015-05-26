@@ -13,10 +13,10 @@ class NoDefaultXCAssetFoundException(Exception):
 
 
 class Merger:
-    def __init__(self, root_dir, assets_dir, default_xcasset_dir):
-        self.root_dir = root_dir
-        self.assets_dir = assets_dir
-        self.default_xcasset_dir = default_xcasset_dir
+    def __init__(self):
+        self.root_dir = None
+        self.assets_dir = None
+        self.default_xcasset_dir = None
 
     def get_selected_xcassets_dir(self):
         xcassets_list = []
@@ -117,6 +117,9 @@ if __name__ == '__main__':
                         help='path to default XCAssets directory')
     args = parser.parse_args()
 
-    merger = Merger(args.root_dir, args.assets_dir, args.default_xcasset_dir)
+    merger = Merger()
+    merger.root_dir = args.root_dir
+    merger.assets_dir = args.assets_dir
+    merger.default_xcasset_dir = args.default_xcasset_dir
     Merger.merge()
 

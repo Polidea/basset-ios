@@ -5,9 +5,9 @@ from wand.image import Image
 
 
 class Converter:
-    def __init__(self, input_dir, output_dir):
-        self.inputDir = input_dir
-        self.outputDir = output_dir
+    def __init__(self):
+        self.inputDir = None
+        self.outputDir = None
 
     def convert(self):
         print "Converting from " + self.inputDir + " to " + self.outputDir
@@ -40,6 +40,8 @@ if __name__ == '__main__':
                         help='directory where generated PNG(s) will be stored')
     args = parser.parse_args()
 
-    converter = Converter(args.input_dir, args.output_dir)
+    converter = Converter()
+    converter.inputDir = args.input_dir
+    converter.outputDir = args.output_dir
     converter.convert()
 

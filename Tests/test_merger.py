@@ -3,7 +3,6 @@ import shutil
 import tempfile
 import json
 from unittest import TestCase
-import collections
 from nose.tools import assert_raises
 from Helpers.merger import Merger, NoXCAssetsFoundException, NoDefaultXCAssetFoundException
 
@@ -23,14 +22,20 @@ class TestMerger(TestCase):
     def test_no_xcassets(self):
         shutil.copytree("./Tests/Resources/tests_merger/NoXCAssetsTestResources", os.path.join(self.temp_dir_path, "Project"))
 
-        merger = Merger(self.temp_dir_path, "Assets", "Project/NoXCAssetsTest/Images.xcassets")
+        merger = Merger()
+        merger.root_dir = self.temp_dir_path
+        merger.assets_dir = "Assets"
+        merger.default_xcasset_dir = "Project/NoXCAssetsTest/Images.xcassets"
         assert_raises(NoXCAssetsFoundException, merger.merge)
 
     def test_multiple_xcassets_no_default(self):
         shutil.copytree("./Tests/Resources/tests_merger/MultipleXCAssetsWithoutDefaultTestResources",
                         os.path.join(self.temp_dir_path, "Project"))
 
-        merger = Merger(self.temp_dir_path, "Assets", "Project/MultipleXCAssetsWithoutDefault/Images.xcassets")
+        merger = Merger()
+        merger.root_dir = self.temp_dir_path
+        merger.assets_dir = "Assets"
+        merger.default_xcasset_dir = "Project/MultipleXCAssetsWithoutDefault/Images.xcassets"
 
         assert_raises(NoDefaultXCAssetFoundException, merger.merge)
 
@@ -39,10 +44,13 @@ class TestMerger(TestCase):
                         os.path.join(self.temp_dir_path, "Project"))
         selected_asset_dir = "Project/SingleXCAssetsTest/Images.xcassets"
 
-        merger = Merger(self.temp_dir_path, "Assets", selected_asset_dir)
+        merger = Merger()
+        merger.root_dir = self.temp_dir_path
+        merger.assets_dir = "Assets"
+        merger.default_xcasset_dir = selected_asset_dir
         merger.merge()
 
-        self.check_if_everything_is_correct(os.path.join(self.temp_dir_path, selected_asset_dir), None)
+        self.check_if_images_are_copied_and_jsons_are_valid(os.path.join(self.temp_dir_path, selected_asset_dir), None)
 
         pass
 
@@ -53,10 +61,13 @@ class TestMerger(TestCase):
         secondary_assets_dir = os.path.join(self.temp_dir_path,
                                             "Project/MultipleXCAssetsIncludingDefault/Secondary.xcassets")
 
-        merger = Merger(self.temp_dir_path, "Assets", selected_asset_dir)
+        merger = Merger()
+        merger.root_dir = self.temp_dir_path
+        merger.assets_dir = "Assets"
+        merger.default_xcasset_dir = selected_asset_dir
         merger.merge()
 
-        self.check_if_everything_is_correct(os.path.join(self.temp_dir_path, selected_asset_dir), None)
+        self.check_if_images_are_copied_and_jsons_are_valid(os.path.join(self.temp_dir_path, selected_asset_dir), None)
 
         self.assertTrue(os.path.isdir(secondary_assets_dir))
         self.assertTrue(os.listdir(secondary_assets_dir) == [])
@@ -67,10 +78,13 @@ class TestMerger(TestCase):
         selected_asset_dir = "Project/MultipleXCAssetsWithAssetThatNeedsUpdating/Images.xcassets"
         secondary_assets_dir = os.path.join(self.temp_dir_path, "Project/MultipleXCAssetsWithAssetThatNeedsUpdating/Secondary.xcassets")
 
-        merger = Merger(self.temp_dir_path, "Assets", selected_asset_dir)
+        merger = Merger()
+        merger.root_dir = self.temp_dir_path
+        merger.assets_dir = "Assets"
+        merger.default_xcasset_dir = selected_asset_dir
         merger.merge()
 
-        self.check_if_everything_is_correct(os.path.join(self.temp_dir_path, selected_asset_dir), 1)
+        self.check_if_images_are_copied_and_jsons_are_valid(os.path.join(self.temp_dir_path, selected_asset_dir), 1)
 
         expected_dict = {
             "images": [
@@ -140,7 +154,7 @@ class TestMerger(TestCase):
 
         return _sorted
 
-    def check_if_everything_is_correct(self, selected_asset_dir, file_excluded_from_json_validation_index):
+    def check_if_images_are_copied_and_jsons_are_valid(self, selected_asset_dir, file_excluded_from_json_validation_index):
         assets_paths_dict = {
             1: {
                 "source":

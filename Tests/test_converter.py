@@ -41,7 +41,9 @@ class TestConverter(TestCase):
 
 
     def test_convert(self):
-        converter = Converter(self.absolute_input_path, self.absolute_output_path)
+        converter = Converter()
+        converter.inputDir = self.absolute_input_path
+        converter.outputDir = self.absolute_output_path
         converter.convert()
 
         def assert_valid_png_file(test_file_path, size):
