@@ -2,7 +2,7 @@ import argparse
 import json
 import os
 import shutil
-
+import coloredlogs, logging
 
 class NoXCAssetsFoundException(Exception):
     pass
@@ -17,6 +17,7 @@ class Merger:
         self.root_dir = None
         self.assets_dir = None
         self.default_xcasset_dir = None
+        coloredlogs.install()
 
     def get_selected_xcassets_dir(self):
         xcassets_list = []
@@ -27,6 +28,7 @@ class Merger:
 
         xcassets_count = len(xcassets_list)
         if xcassets_count == 0:
+            logging.error("No xcassets found")
             raise NoXCAssetsFoundException
         elif xcassets_count == 1:
             selected_xcassets = xcassets_list[0]
@@ -34,16 +36,22 @@ class Merger:
             if os.path.join(self.root_dir, self.default_xcasset_dir) in xcassets_list:
                 selected_xcassets = self.default_xcasset_dir
             else:
+                logging.error("Found " + str(xcassets_count) + " xcassets, but none of them is default one!")
+                logging.error("Found xcassets:")
+                for single_xcasset in xcassets_list:
+                    logging.error(single_xcasset)
                 raise NoDefaultXCAssetFoundException
         return selected_xcassets
 
     def merge(self):
-        print "Merging assets from " + self.assets_dir + " using " + self.default_xcasset_dir + " as default xcassets"
+        logging.info("Merging assets from " + self.assets_dir + " using " + self.default_xcasset_dir + " as default xcassets")
 
         absolute_source_assets_dir = os.path.join(self.root_dir, self.assets_dir)
         relative_destination_xcassets = self.get_selected_xcassets_dir()
+        logging.info("Selected " + relative_destination_xcassets + " xcasset")
 
         assets_dict = {}
+        merged_files_count = 0
         for path, subdirectories, files in os.walk(absolute_source_assets_dir):
             for filename in files:
                 if filename.lower().endswith(".png") or filename.lower().endswith(".jpg"):
@@ -98,14 +106,14 @@ class Merger:
                     with open(content_json_file_path, "w+") as data_file:
                         json.dump(contents_json, data_file, indent=1)
 
-
-
                     # Copy image
                     destination_path = os.path.join(asset_dir_in_destination_xcasset, filename)
                     source_path = os.path.join(absolute_source_assets_dir, relative_asset_directory_path, filename)
                     shutil.copy2(source_path, destination_path)
+                    logging.info("Merged " + source_path)
+                    merged_files_count += 1
 
-        pass
+        logging.info("Finished merging with xcassets folder. Merged " + str(merged_files_count) + " files.")
 
 
 if __name__ == '__main__':

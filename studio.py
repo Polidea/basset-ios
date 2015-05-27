@@ -3,12 +3,19 @@ import os
 from Helpers.configuration_manager import ConfigurationManager
 from Helpers.converter import Converter
 from Helpers.merger import Merger
+import coloredlogs, logging
 
 class Studio:
     def __init__(self, configuration, merger, converter):
+        coloredlogs.install()
+
+        logging.info("Using configuration: \n" + str(configuration))
+
         self.configuration = configuration
         self.merger = merger
         self.converter = converter
+
+
 
         self.merger.assets_dir = configuration.generated_assets_dir
         self.merger.root_dir = configuration.root_dir
@@ -35,16 +42,16 @@ if __name__ == '__main__':
                         help='path to directory where generated PNGs will be stored')
     parser.add_argument('-r', '--root_dir', default=os.getcwd(), help='path to root directory')
     parser.add_argument('-m', '--merge_with_xcassets', default=True, help='will script process xcassets directories')
-    parser.add_argument('-c', '--config', default="Assets/config.yml", help='path to config file')
+    parser.add_argument('-c', '--config', help='path to config file')
     args = parser.parse_args()
 
     merger = Merger()
     converter = Converter()
-    configuration = ConfigurationManager(root_dir=args.root_dir,
+    configuration = ConfigurationManager.get_configuration(root_dir=args.root_dir,
                                          xcassets_dir=args.xcassets_dir,
                                          raw_assets=args.raw_assets_dir,
                                          generated_assets_dir=args.generated_assets_dir,
                                          merge_with_xcassets=args.merge_with_xcassets,
-                                         config=args.config)
+                                         config_file_path=args.config)
     studio = Studio(merger=merger, converter=converter, configuration=configuration)
     studio.launch()

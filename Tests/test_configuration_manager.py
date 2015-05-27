@@ -31,7 +31,7 @@ class TestConfigurationManager(TestCase):
                                                                root_dir=self.sample_root_dir,
                                                                generated_assets_dir=self.sample_generated_assets_dir,
                                                                merge_with_xcassets=self.sample_merge_with,
-                                                               config=None)
+                                                               config_file_path=None)
 
         self.assertTrue(configuration.root_dir == self.sample_root_dir)
         self.assertTrue(configuration.xcassets_dir == self.sample_xcassets_dir)
@@ -45,7 +45,7 @@ class TestConfigurationManager(TestCase):
                                                                root_dir=self.sample_root_dir,
                                                                generated_assets_dir=self.sample_generated_assets_dir,
                                                                merge_with_xcassets=self.sample_merge_with,
-                                                               config=os.path.join(self.config_files_path,
+                                                               config_file_path=os.path.join(self.config_files_path,
                                                                                    os.path.join(self.temp_dir_path, self.config_files_path, "config.yml")))
 
         self.assertTrue(configuration.root_dir == "fake_root_dir")
@@ -63,20 +63,20 @@ class TestConfigurationManager(TestCase):
 
     def test_fail_when_there_is_empty_config_file(self):
         self.assertRaises(NotCompleteConfigurationInConfigFileException, ConfigurationManager.get_configuration, None, None, None, None, None,
-                          config=os.path.join(self.config_files_path, os.path.join(self.temp_dir_path, self.config_files_path, "empty.yml")))
+                          config_file_path=os.path.join(self.config_files_path, os.path.join(self.temp_dir_path, self.config_files_path, "empty.yml")))
 
     def test_fail_when_there_are_not_enough_parameters_in_config_file(self):
         self.assertRaises(NotCompleteConfigurationInConfigFileException, ConfigurationManager.get_configuration, None, None, None, None, None,
-                          config=os.path.join(self.config_files_path, os.path.join(self.temp_dir_path, self.config_files_path, "half_empty.yml")))
+                          config_file_path=os.path.join(self.config_files_path, os.path.join(self.temp_dir_path, self.config_files_path, "half_empty.yml")))
 
     def test_fail_when_not_all_parameters_are_provided(self):
-        self.assertRaises(NotAllConfigurationParametersPresentException, ConfigurationManager.get_configuration, None, "b", "c", "d", "e", config=None)
-        self.assertRaises(NotAllConfigurationParametersPresentException,ConfigurationManager.get_configuration, "", "b", "c", "d", "e", config=None)
-        self.assertRaises(NotAllConfigurationParametersPresentException,ConfigurationManager.get_configuration, "a", None, "c", "d", "e", config=None)
-        self.assertRaises(NotAllConfigurationParametersPresentException,ConfigurationManager.get_configuration, "a", "", "c", "d", "e", config=None)
-        self.assertRaises(NotAllConfigurationParametersPresentException,ConfigurationManager.get_configuration, "a", "b", None, "d", "e", config=None)
-        self.assertRaises(NotAllConfigurationParametersPresentException,ConfigurationManager.get_configuration, "a", "b", "", "d", "e", config=None)
-        self.assertRaises(NotAllConfigurationParametersPresentException,ConfigurationManager.get_configuration, "a", "b", "c", None, "e", config=None)
-        self.assertRaises(NotAllConfigurationParametersPresentException,ConfigurationManager.get_configuration, "a", "b", "c", "", "e", config=None)
-        self.assertRaises(NotAllConfigurationParametersPresentException,ConfigurationManager.get_configuration, "a", "b", "c", "d", None, config=None)
-        self.assertRaises(NotAllConfigurationParametersPresentException,ConfigurationManager.get_configuration, "a", "b", "c", "d", "", config=None)
+        self.assertRaises(NotAllConfigurationParametersPresentException, ConfigurationManager.get_configuration, None, "b", "c", "d", "e", config_file_path=None)
+        self.assertRaises(NotAllConfigurationParametersPresentException,ConfigurationManager.get_configuration, "", "b", "c", "d", "e", config_file_path=None)
+        self.assertRaises(NotAllConfigurationParametersPresentException,ConfigurationManager.get_configuration, "a", None, "c", "d", "e", config_file_path=None)
+        self.assertRaises(NotAllConfigurationParametersPresentException,ConfigurationManager.get_configuration, "a", "", "c", "d", "e", config_file_path=None)
+        self.assertRaises(NotAllConfigurationParametersPresentException,ConfigurationManager.get_configuration, "a", "b", None, "d", "e", config_file_path=None)
+        self.assertRaises(NotAllConfigurationParametersPresentException,ConfigurationManager.get_configuration, "a", "b", "", "d", "e", config_file_path=None)
+        self.assertRaises(NotAllConfigurationParametersPresentException,ConfigurationManager.get_configuration, "a", "b", "c", None, "e", config_file_path=None)
+        self.assertRaises(NotAllConfigurationParametersPresentException,ConfigurationManager.get_configuration, "a", "b", "c", "", "e", config_file_path=None)
+        self.assertRaises(NotAllConfigurationParametersPresentException,ConfigurationManager.get_configuration, "a", "b", "c", "d", None, config_file_path=None)
+        self.assertRaises(NotAllConfigurationParametersPresentException,ConfigurationManager.get_configuration, "a", "b", "c", "d", "", config_file_path=None)

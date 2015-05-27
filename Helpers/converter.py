@@ -1,16 +1,20 @@
 import argparse
 import os
 import shutil
+import coloredlogs, logging
 from wand.image import Image
 
 
 class Converter:
     def __init__(self):
+        coloredlogs.install()
         self.inputDir = None
         self.outputDir = None
 
     def convert(self):
-        print "Converting from " + self.inputDir + " to " + self.outputDir
+
+        logging.info("Converting vector files from " + self.inputDir + " to " + self.outputDir)
+        converted_files_count = 0
 
         for original_base_path, subdirectories, files in os.walk(self.inputDir):
             for original_filename in files:
@@ -23,6 +27,9 @@ class Converter:
                             os.makedirs(new_base_path)
                     original_full_path = os.path.join(original_base_path, original_filename)
 
+                    logging.info("Converting " + original_full_path)
+                    converted_files_count += 1
+
                     with Image(filename=original_full_path) as img:
                         img.save(filename=os.path.join(new_base_path, basename + ".png"))
                     with Image(filename=original_full_path) as img:
@@ -31,6 +38,8 @@ class Converter:
                     with Image(filename=original_full_path) as img:
                         img.resize(img.width * 3, img.height * 3)
                         img.save(filename=os.path.join(new_base_path, basename + "@3x.png"))
+
+        logging.info("Images conversion finished. Converted " + str(converted_files_count) + " images")
 
 
 if __name__ == '__main__':
