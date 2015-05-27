@@ -10,9 +10,20 @@ class Studio:
         self.merger = merger
         self.converter = converter
 
+        self.merger.assets_dir = configuration.generated_assets_dir
+        self.merger.root_dir = configuration.root_dir
+        self.merger.default_xcasset_dir = configuration.xcassets_dir
+
+        self.converter.inputDir = configuration.raw_assets
+        self.converter.outputDir = configuration.generated_assets_dir
+
+
+
     def launch(self):
         self.converter.convert()
-        self.merger.merge()
+        if self.configuration.merge_with_xcassets:
+            self.merger.merge()
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Converts raw assets to proper PNG(s).')
@@ -29,7 +40,6 @@ if __name__ == '__main__':
 
     merger = Merger()
     converter = Converter()
-    # def __init__(self, xcassets_dir, raw_assets, generated_assets_dir, root_dir, merge_with_xcassets, config):
     configuration = ConfigurationManager(root_dir=args.root_dir,
                                          xcassets_dir=args.xcassets_dir,
                                          raw_assets=args.raw_assets_dir,

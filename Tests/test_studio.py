@@ -3,14 +3,15 @@ from Helpers.configuration_manager import StudioConfiguration
 from Helpers.converter import Converter
 from Helpers.merger import Merger
 from studio import Studio
-from mock import MagicMock
+from mock import MagicMock, Mock, call
+
 
 class TestStudio(TestCase):
     sample_root_dir = "sample_root_dir"
     sample_xcassets_dir = "sample_xcassets_dir"
     sample_raw_assets_dir = "sample_raw_assets_dir"
     sample_generated_assets_dir = "sample_generated_assets_dir"
-    sample_merge_with = "sample_merge_with_xcassets"
+    sample_merge_with = True
 
     def setUp(self):
         pass
@@ -40,16 +41,26 @@ class TestStudio(TestCase):
 
     def test_if_converter_and_merger_methods_are_called_in_order(self):
         configuration = StudioConfiguration()
-        merger = Merger()
-        converter = Converter()
-        merger.merge = Merger()
+        configuration.merge_with_xcassets = True
 
-        converter.convert = MagicMock()
-        merger.merge = MagicMock()
+        merger = Mock()
+        converter = Mock()
 
         studio = Studio(merger=merger, converter=converter, configuration=configuration)
         studio.launch()
 
-        converter.convert.assert_called_with()
-        #TODO think about order
-        merger.merge.assert_called_with()
+        converter.convert.assert_called_once_with()
+        merger.merge.assert_called_once_with()
+
+    def test_respect_merge_with_xcassets_flag(self):
+        configuration = StudioConfiguration()
+        configuration.merge_with_xcassets = False
+
+        merger = Mock()
+        converter = Mock()
+        studio = Studio(merger=merger, converter=converter, configuration=configuration)
+        studio.launch()
+
+        converter.convert.assert_called_once_with()
+        self.assertEqual(merger.merge.call_count, 0)
+
