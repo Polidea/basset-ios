@@ -19,7 +19,7 @@ class NotAllConfigurationParametersPresentException(Exception):
     pass
 
 
-class StudioConfiguration:
+class BassetConfiguration:
     def __init__(self):
         self.xcassets_dir = None
         self.raw_assets = None
@@ -41,7 +41,7 @@ class ConfigurationManager:
 
     @staticmethod
     def get_configuration(xcassets_dir, raw_assets, generated_assets_dir, merge_with_xcassets, config_file_path):
-        configuration = StudioConfiguration()
+        configuration = BassetConfiguration()
 
         if not xcassets_dir and not raw_assets and not generated_assets_dir and not merge_with_xcassets and not config_file_path:
             raise NoConfigurationProvidedException

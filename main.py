@@ -7,7 +7,7 @@ from Helpers.converter import Converter
 from Helpers.merger import Merger, NoXCAssetsFoundException, NoDefaultXCAssetFoundException
 import coloredlogs, logging
 
-class Studio:
+class Basset:
     def __init__(self, configuration, merger, converter):
         coloredlogs.install()
 
@@ -22,8 +22,6 @@ class Studio:
 
         self.converter.inputDir = configuration.raw_assets
         self.converter.outputDir = configuration.generated_assets_dir
-
-
 
     def launch(self):
         self.converter.convert()
@@ -51,10 +49,10 @@ if __name__ == '__main__':
                                                            generated_assets_dir=args.generated_assets_dir,
                                                            merge_with_xcassets=args.merge_with_xcassets,
                                                            config_file_path=args.config)
-    studio = Studio(merger=merger, converter=converter, configuration=configuration)
+    basset = Basset(merger=merger, converter=converter, configuration=configuration)
 
     try:
-        studio.launch()
+        basset.launch()
     except NoConfigurationProvidedException:
         logging.error("No configuration provided!")
     except NoConfigFileFoundException:
