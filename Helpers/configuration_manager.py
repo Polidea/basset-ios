@@ -44,17 +44,14 @@ class ConfigurationManager:
         configuration = StudioConfiguration()
 
         if not xcassets_dir and not raw_assets and not generated_assets_dir and not merge_with_xcassets and not config_file_path:
-            logging.error("No configuration provided!")
             raise NoConfigurationProvidedException
 
         if not config_file_path and (
                                 not xcassets_dir or not raw_assets or not generated_assets_dir or not merge_with_xcassets):
-            logging.error("Not all config parameters found!")
             raise NotAllConfigurationParametersPresentException
 
         if config_file_path:
             if not os.path.isfile(config_file_path):
-                logging.error("Config file not found!")
                 raise NoConfigFileFoundException
 
             yml_file = open(config_file_path)
@@ -63,7 +60,6 @@ class ConfigurationManager:
 
             if not yml_config_dict or not all(k in yml_config_dict for k in (
                     "xcassets_dir", "raw_assets", "generated_assets_dir", "merge_with_xcassets")):
-                logging.error("Config file broken!")
                 raise NotCompleteConfigurationInConfigFileException
 
             logging.info("Using configuration from " + config_file_path + " file")

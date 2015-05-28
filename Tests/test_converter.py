@@ -72,3 +72,14 @@ class TestConverter(TestCase):
                               (200, 200))
         assert_valid_png_file(os.path.join(self.converter_output_tests_resource_path, "subfolder", "subsubfolder", "test-05@3x.png"),
                               (300, 300))
+    def test_clear_output_directory_before_conversion(self):
+        dummy_file_path = os.path.join(self.converter_output_tests_resource_path, "dummy.file")
+        open(dummy_file_path, 'a').close()
+        self.assertTrue(os.path.isfile(dummy_file_path))
+
+        converter = Converter()
+        converter.inputDir = self.converter_tests_resource_path
+        converter.outputDir = self.converter_output_tests_resource_path
+        converter.convert()
+
+        self.assertFalse(os.path.isfile(dummy_file_path))

@@ -1,8 +1,10 @@
 import argparse
 import os
-from Helpers.configuration_manager import ConfigurationManager
+from Helpers.configuration_manager import ConfigurationManager, NoConfigurationProvidedException, \
+    NoConfigFileFoundException, NotCompleteConfigurationInConfigFileException, \
+    NotAllConfigurationParametersPresentException
 from Helpers.converter import Converter
-from Helpers.merger import Merger
+from Helpers.merger import Merger, NoXCAssetsFoundException, NoDefaultXCAssetFoundException
 import coloredlogs, logging
 
 class Studio:
@@ -50,4 +52,18 @@ if __name__ == '__main__':
                                                            merge_with_xcassets=args.merge_with_xcassets,
                                                            config_file_path=args.config)
     studio = Studio(merger=merger, converter=converter, configuration=configuration)
-    studio.launch()
+
+    try:
+        studio.launch()
+    except NoConfigurationProvidedException:
+        logging.error("No configuration provided!")
+    except NoConfigFileFoundException:
+        logging.error("Config file not found!")
+    except NotCompleteConfigurationInConfigFileException:
+        logging.error("Config file broken!")
+    except NotAllConfigurationParametersPresentException:
+        logging.error("Not all config parameters found!")
+    except NoXCAssetsFoundException:
+        logging.error("No xcassets found")
+    except NoDefaultXCAssetFoundException as e:
+        logging.error("Found {0} xcassets, but none of them is default one!".format(e.args[0]))

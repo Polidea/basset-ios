@@ -12,8 +12,10 @@ class Converter:
         self.outputDir = None
 
     def convert(self):
-
         logging.info("Converting vector files from " + self.inputDir + " to " + self.outputDir)
+        if os.path.isdir(self.outputDir):
+            shutil.rmtree(self.outputDir)
+
         converted_files_count = 0
 
         for original_base_path, subdirectories, files in os.walk(self.inputDir):

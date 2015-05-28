@@ -32,7 +32,6 @@ class Merger:
 
         xcassets_count = len(xcassets_list)
         if xcassets_count == 0:
-            logging.error("No xcassets found")
             raise NoXCAssetsFoundException
         elif xcassets_count == 1:
             selected_xcassets = xcassets_list[0]
@@ -40,8 +39,7 @@ class Merger:
             if self.default_xcasset_dir in xcassets_list:
                 selected_xcassets = self.default_xcasset_dir
             else:
-                logging.error("Found " + str(xcassets_count) + " xcassets, but none of them is default one!")
-                raise NoDefaultXCAssetFoundException
+                raise NoDefaultXCAssetFoundException(str(xcassets_count))
         return selected_xcassets
 
     def merge(self):
@@ -89,9 +87,12 @@ class Merger:
                     image_found = False
 
                     for index, scaled_image_dict in enumerate(contents_json["images"]):
-                        if scaled_image_dict["idiom"] == "universal" and scaled_image_dict["scale"] == asset_scale:
-                            contents_json["images"][index]["filename"] = filename
-                            image_found = True
+                        needed_keys_present = all(k in scaled_image_dict for k in ("idiom", "scale"))
+                        if needed_keys_present:
+                            is_universal_asset_with_scale = scaled_image_dict["idiom"] == "universal" and scaled_image_dict["scale"] == asset_scale
+                            if is_universal_asset_with_scale:
+                                contents_json["images"][index]["filename"] = filename
+                                image_found = True
 
                     if not image_found:
                         contents_json["images"].append(
