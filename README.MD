@@ -1,4 +1,4 @@
-#Basset
+#Basset-ios
 
 Todo (Brief)
 
@@ -22,3 +22,4 @@ Todo (command line parameters)
 
 
 ###License
+Basset-ios is released under a MIT License. See LICENSE file for details.
