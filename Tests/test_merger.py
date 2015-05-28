@@ -6,13 +6,25 @@ from unittest import TestCase
 from nose.tools import assert_raises
 from Helpers.merger import Merger, NoXCAssetsFoundException, NoDefaultXCAssetFoundException
 
+
 class TestMerger(TestCase):
     temp_dir_path = ""
+    script_root_dir_path = ""
     resources_path = "Assets"
+
+    @classmethod
+    def setUpClass(cls):
+        TestMerger.script_root_dir_path = os.getcwd()
+
+    @classmethod
+    def tearDownClass(cls):
+        os.chdir(TestMerger.script_root_dir_path)
 
     def setUp(self):
         self.temp_dir_path = tempfile.mkdtemp()
-        shutil.copytree("./Tests/Resources/tests_merger/SampleAssets", os.path.join(self.temp_dir_path, self.resources_path))
+        shutil.copytree(os.path.join(TestMerger.script_root_dir_path, "Tests/Resources/tests_merger/SampleAssets"),
+                        os.path.join(self.temp_dir_path, self.resources_path))
+        os.chdir(self.temp_dir_path)
         pass
 
     def tearDown(self):
@@ -20,33 +32,33 @@ class TestMerger(TestCase):
         shutil.rmtree(self.temp_dir_path)
 
     def test_no_xcassets(self):
-        shutil.copytree("./Tests/Resources/tests_merger/NoXCAssetsTestResources", os.path.join(self.temp_dir_path, "Project"))
+        shutil.copytree(os.path.join(TestMerger.script_root_dir_path, "Tests/Resources/tests_merger/NoXCAssetsTestResources"),
+                        os.path.join(self.temp_dir_path, "Project"))
 
         merger = Merger()
-        merger.root_dir = self.temp_dir_path
-        merger.assets_dir = "Assets"
+        merger.source_assets_dir = "Assets"
         merger.default_xcasset_dir = "Project/NoXCAssetsTest/Images.xcassets"
         assert_raises(NoXCAssetsFoundException, merger.merge)
 
     def test_multiple_xcassets_no_default(self):
-        shutil.copytree("./Tests/Resources/tests_merger/MultipleXCAssetsWithoutDefaultTestResources",
+        shutil.copytree(os.path.join(TestMerger.script_root_dir_path,
+                                     "Tests/Resources/tests_merger/MultipleXCAssetsWithoutDefaultTestResources"),
                         os.path.join(self.temp_dir_path, "Project"))
 
         merger = Merger()
-        merger.root_dir = self.temp_dir_path
-        merger.assets_dir = "Assets"
+        merger.source_assets_dir = "Assets"
         merger.default_xcasset_dir = "Project/MultipleXCAssetsWithoutDefault/Images.xcassets"
 
         assert_raises(NoDefaultXCAssetFoundException, merger.merge)
 
     def test_single_asset(self):
-        shutil.copytree("./Tests/Resources/tests_merger/SingleXCAssetTestResources",
-                        os.path.join(self.temp_dir_path, "Project"))
+        shutil.copytree(
+            os.path.join(TestMerger.script_root_dir_path, "Tests/Resources/tests_merger/SingleXCAssetTestResources"),
+            os.path.join(self.temp_dir_path, "Project"))
         selected_asset_dir = "Project/SingleXCAssetsTest/Images.xcassets"
 
         merger = Merger()
-        merger.root_dir = self.temp_dir_path
-        merger.assets_dir = "Assets"
+        merger.source_assets_dir = "Assets"
         merger.default_xcasset_dir = selected_asset_dir
         merger.merge()
 
@@ -55,15 +67,15 @@ class TestMerger(TestCase):
         pass
 
     def test_multiple_assets_with_default(self):
-        shutil.copytree("./Tests/Resources/tests_merger/MultipleXCAssetsIncludingDefaultTestResources",
+        shutil.copytree(os.path.join(TestMerger.script_root_dir_path,
+                                     "Tests/Resources/tests_merger/MultipleXCAssetsIncludingDefaultTestResources"),
                         os.path.join(self.temp_dir_path, "Project"))
         selected_asset_dir = "Project/MultipleXCAssetsIncludingDefault/Images.xcassets"
         secondary_assets_dir = os.path.join(self.temp_dir_path,
                                             "Project/MultipleXCAssetsIncludingDefault/Secondary.xcassets")
 
         merger = Merger()
-        merger.root_dir = self.temp_dir_path
-        merger.assets_dir = "Assets"
+        merger.source_assets_dir = "Assets"
         merger.default_xcasset_dir = selected_asset_dir
         merger.merge()
 
@@ -73,18 +85,19 @@ class TestMerger(TestCase):
         self.assertTrue(os.listdir(secondary_assets_dir) == [])
 
     def test_multiple_assets_with_existing_asset(self):
-        shutil.copytree("./Tests/Resources/tests_merger/MultipleXCAssetsWithAssetThatNeedsUpdatingResources",
+        shutil.copytree(os.path.join(TestMerger.script_root_dir_path,
+                                     "Tests/Resources/tests_merger/MultipleXCAssetsWithAssetThatNeedsUpdatingResources"),
                         os.path.join(self.temp_dir_path, "Project"))
         selected_asset_dir = "Project/MultipleXCAssetsWithAssetThatNeedsUpdating/Images.xcassets"
-        secondary_assets_dir = os.path.join(self.temp_dir_path, "Project/MultipleXCAssetsWithAssetThatNeedsUpdating/Secondary.xcassets")
+        secondary_assets_dir = os.path.join(self.temp_dir_path,
+                                            "Project/MultipleXCAssetsWithAssetThatNeedsUpdating/Secondary.xcassets")
 
         merger = Merger()
-        merger.root_dir = self.temp_dir_path
-        merger.assets_dir = "Assets"
+        merger.source_assets_dir = "Assets"
         merger.default_xcasset_dir = selected_asset_dir
         merger.merge()
 
-        self.check_if_images_are_copied_and_jsons_are_valid(os.path.join(self.temp_dir_path, selected_asset_dir), 1)
+        self.check_if_images_are_copied_and_jsons_are_valid(selected_asset_dir, 1)
 
         expected_dict = {
             "images": [
@@ -122,7 +135,8 @@ class TestMerger(TestCase):
             }
         }
 
-        with open(os.path.join(os.path.join(self.temp_dir_path, selected_asset_dir), "test-01.imageset/Contents.json")) as data_file:
+        with open(os.path.join(os.path.join(self.temp_dir_path, selected_asset_dir),
+                               "test-01.imageset/Contents.json")) as data_file:
             actual_dict = json.load(data_file)
             actual_dict = self.deep_sort(actual_dict)
             expected_dict = self.deep_sort(expected_dict)
@@ -154,7 +168,8 @@ class TestMerger(TestCase):
 
         return _sorted
 
-    def check_if_images_are_copied_and_jsons_are_valid(self, selected_asset_dir, file_excluded_from_json_validation_index):
+    def check_if_images_are_copied_and_jsons_are_valid(self, selected_asset_dir,
+                                                       file_excluded_from_json_validation_index):
         assets_paths_dict = {
             1: {
                 "source":

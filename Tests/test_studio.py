@@ -7,7 +7,6 @@ from mock import MagicMock, Mock, call
 
 
 class TestStudio(TestCase):
-    sample_root_dir = "sample_root_dir"
     sample_xcassets_dir = "sample_xcassets_dir"
     sample_raw_assets_dir = "sample_raw_assets_dir"
     sample_generated_assets_dir = "sample_generated_assets_dir"
@@ -25,7 +24,6 @@ class TestStudio(TestCase):
         configuration.xcassets_dir = self.sample_xcassets_dir
         configuration.raw_assets = self.sample_raw_assets_dir
         configuration.generated_assets_dir = self.sample_generated_assets_dir
-        configuration.root_dir = self.sample_root_dir
         configuration.merge_with_xcassets = self.sample_merge_with
 
         merger = Merger()
@@ -34,7 +32,6 @@ class TestStudio(TestCase):
 
         self.assertTrue(studio.merger.default_xcasset_dir == self.sample_xcassets_dir)
         self.assertTrue(studio.merger.assets_dir == self.sample_generated_assets_dir)
-        self.assertTrue(studio.merger.root_dir == self.sample_root_dir)
 
         self.assertTrue(studio.converter.inputDir == self.sample_raw_assets_dir)
         self.assertTrue(studio.converter.outputDir == self.sample_generated_assets_dir)

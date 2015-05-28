@@ -4,6 +4,7 @@ import os
 import shutil
 import coloredlogs, logging
 
+
 class NoXCAssetsFoundException(Exception):
     pass
 
@@ -14,17 +15,20 @@ class NoDefaultXCAssetFoundException(Exception):
 
 class Merger:
     def __init__(self):
-        self.root_dir = None
-        self.assets_dir = None
+        self.source_assets_dir = None
         self.default_xcasset_dir = None
         coloredlogs.install()
 
     def get_selected_xcassets_dir(self):
         xcassets_list = []
         selected_xcassets = None
-        for path, subdirectories, files in os.walk(self.root_dir):
+        for path, subdirectories, files in os.walk(os.getcwd()):
             if path.endswith(".xcassets") and os.path.isdir(path):
-                xcassets_list.append(path)
+                xcassets_list.append(os.path.relpath(path, os.getcwd()))
+
+        logging.info("Found xcassets:")
+        for single_xcasset in xcassets_list:
+            logging.info(single_xcasset)
 
         xcassets_count = len(xcassets_list)
         if xcassets_count == 0:
@@ -33,30 +37,25 @@ class Merger:
         elif xcassets_count == 1:
             selected_xcassets = xcassets_list[0]
         elif xcassets_count >= 2:
-            if os.path.join(self.root_dir, self.default_xcasset_dir) in xcassets_list:
+            if self.default_xcasset_dir in xcassets_list:
                 selected_xcassets = self.default_xcasset_dir
             else:
                 logging.error("Found " + str(xcassets_count) + " xcassets, but none of them is default one!")
-                logging.error("Found xcassets:")
-                for single_xcasset in xcassets_list:
-                    logging.error(single_xcasset)
                 raise NoDefaultXCAssetFoundException
         return selected_xcassets
 
     def merge(self):
-        logging.info("Merging assets from " + self.assets_dir + " using " + self.default_xcasset_dir + " as default xcassets")
+        logging.info(
+            "Merging assets from " + self.source_assets_dir + " using " + self.default_xcasset_dir + " as default xcassets")
 
-        absolute_source_assets_dir = os.path.join(self.root_dir, self.assets_dir)
-        relative_destination_xcassets = self.get_selected_xcassets_dir()
-        logging.info("Selected " + relative_destination_xcassets + " xcasset")
+        destination_xcassets_dir = self.get_selected_xcassets_dir()
+        logging.info("Selected " + destination_xcassets_dir + " xcasset")
 
-        assets_dict = {}
         merged_files_count = 0
-        for path, subdirectories, files in os.walk(absolute_source_assets_dir):
+        for path, subdirectories, files in os.walk(self.source_assets_dir):
             for filename in files:
                 if filename.lower().endswith(".png") or filename.lower().endswith(".jpg"):
                     basename = filename.split(".")[0]
-                    relative_asset_directory_path = os.path.relpath(path, absolute_source_assets_dir)
 
                     if basename[-3:] in ["@2x", "@3x"]:
                         asset_scale = basename[-2:]
@@ -65,8 +64,8 @@ class Merger:
                         asset_scale = "1x"
                         asset_name = basename
 
-                    asset_dir_in_destination_xcasset = os.path.join(self.root_dir, relative_destination_xcassets,
-                                                                    relative_asset_directory_path,
+                    asset_dir_in_destination_xcasset = os.path.join(destination_xcassets_dir,
+                                                                    os.path.relpath(path, self.source_assets_dir),
                                                                     asset_name + ".imageset")
                     if not os.path.isdir(asset_dir_in_destination_xcasset):
                         os.makedirs(asset_dir_in_destination_xcasset)
@@ -108,7 +107,7 @@ class Merger:
 
                     # Copy image
                     destination_path = os.path.join(asset_dir_in_destination_xcasset, filename)
-                    source_path = os.path.join(absolute_source_assets_dir, relative_asset_directory_path, filename)
+                    source_path = os.path.join(os.getcwd(), path, filename)
                     shutil.copy2(source_path, destination_path)
                     logging.info("Merged " + source_path)
                     merged_files_count += 1
@@ -120,14 +119,12 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Converts raw assets to proper PNG(s).')
     parser.add_argument('-a', '--assets_dir', default="./GeneratedAssets",
                         help='path to directory with generated assets')
-    parser.add_argument('-r', '--root_dir', default=os.getcwd(), help='path to root directory')
     parser.add_argument('-d', '--default_xcassets_dir', default="./GeneratedAssets",
                         help='path to default XCAssets directory')
     args = parser.parse_args()
 
     merger = Merger()
-    merger.root_dir = args.root_dir
-    merger.assets_dir = args.assets_dir
+    merger.source_assets_dir = args.assets_dir
     merger.default_xcasset_dir = args.default_xcasset_dir
     Merger.merge()
 

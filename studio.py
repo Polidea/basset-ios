@@ -18,7 +18,6 @@ class Studio:
 
 
         self.merger.assets_dir = configuration.generated_assets_dir
-        self.merger.root_dir = configuration.root_dir
         self.merger.default_xcasset_dir = configuration.xcassets_dir
 
         self.converter.inputDir = configuration.raw_assets
@@ -47,11 +46,10 @@ if __name__ == '__main__':
 
     merger = Merger()
     converter = Converter()
-    configuration = ConfigurationManager.get_configuration(root_dir=args.root_dir,
-                                         xcassets_dir=args.xcassets_dir,
-                                         raw_assets=args.raw_assets_dir,
-                                         generated_assets_dir=args.generated_assets_dir,
-                                         merge_with_xcassets=args.merge_with_xcassets,
-                                         config_file_path=args.config)
+    configuration = ConfigurationManager.get_configuration(xcassets_dir=args.xcassets_dir,
+                                                           raw_assets=args.raw_assets_dir,
+                                                           generated_assets_dir=args.generated_assets_dir,
+                                                           merge_with_xcassets=args.merge_with_xcassets,
+                                                           config_file_path=args.config)
     studio = Studio(merger=merger, converter=converter, configuration=configuration)
     studio.launch()
