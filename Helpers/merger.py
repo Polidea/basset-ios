@@ -45,8 +45,8 @@ class Merger:
         return selected_xcassets
 
     def merge(self):
-        logging.info(
-            "Merging assets from " + self.source_assets_dir + " using " + self.default_xcasset_dir + " as default xcassets")
+        logging.info("Merging assets from {0} using {1} as default xcassets".format(self.source_assets_dir,
+                                                                                    self.default_xcasset_dir))
 
         destination_xcassets_dir = self.get_selected_xcassets_dir()
         logging.info("Selected " + destination_xcassets_dir + " xcasset")

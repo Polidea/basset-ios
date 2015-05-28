@@ -31,7 +31,7 @@ class TestStudio(TestCase):
         studio = Studio(merger=merger, converter=converter, configuration=configuration)
 
         self.assertTrue(studio.merger.default_xcasset_dir == self.sample_xcassets_dir)
-        self.assertTrue(studio.merger.assets_dir == self.sample_generated_assets_dir)
+        self.assertTrue(studio.merger.source_assets_dir == self.sample_generated_assets_dir)
 
         self.assertTrue(studio.converter.inputDir == self.sample_raw_assets_dir)
         self.assertTrue(studio.converter.outputDir == self.sample_generated_assets_dir)

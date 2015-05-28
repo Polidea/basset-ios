@@ -15,9 +15,7 @@ class Studio:
         self.merger = merger
         self.converter = converter
 
-
-
-        self.merger.assets_dir = configuration.generated_assets_dir
+        self.merger.source_assets_dir = configuration.generated_assets_dir
         self.merger.default_xcasset_dir = configuration.xcassets_dir
 
         self.converter.inputDir = configuration.raw_assets
