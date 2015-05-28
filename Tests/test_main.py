@@ -2,11 +2,11 @@ from unittest import TestCase
 from Helpers.configuration_manager import BassetConfiguration
 from Helpers.converter import Converter
 from Helpers.merger import Merger
-from main import Basset
+from basset import Basset
 from mock import MagicMock, Mock, call
 
 
-class TestMain(TestCase):
+class TestBasset(TestCase):
     sample_xcassets_dir = "sample_xcassets_dir"
     sample_raw_assets_dir = "sample_raw_assets_dir"
     sample_generated_assets_dir = "sample_generated_assets_dir"

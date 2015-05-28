@@ -37,7 +37,6 @@ if __name__ == '__main__':
                         help='path to directory with raw, vector based graphics')
     parser.add_argument('-g', '--generated_assets_dir', default="Resources/GeneratedAssets",
                         help='path to directory where generated PNGs will be stored')
-    parser.add_argument('-r', '--root_dir', default=os.getcwd(), help='path to root directory')
     parser.add_argument('-m', '--merge_with_xcassets', default=True, help='will script process xcassets directories')
     parser.add_argument('-c', '--config', help='path to config file')
     args = parser.parse_args()
