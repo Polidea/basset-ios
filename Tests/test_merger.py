@@ -81,6 +81,10 @@ class TestMerger(TestCase):
 
         self.check_if_images_are_copied_and_jsons_are_valid(os.path.join(self.temp_dir_path, selected_asset_dir), None)
 
+        for path, subdirectories, files in os.walk(self.temp_dir_path):
+            for original_filename in files:
+                print path + "/" + original_filename
+
         self.assertTrue(os.path.isdir(secondary_assets_dir))
         self.assertTrue(os.listdir(secondary_assets_dir) == [])
 
