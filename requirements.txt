@@ -1,0 +1,2 @@
+coloredlogs==1.0
+Wand==0.4.0
