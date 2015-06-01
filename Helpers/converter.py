@@ -23,7 +23,7 @@ class Converter:
                 basename = original_filename.split(".")[0]
                 extension = original_filename.split(".")[1]
 
-                if extension.lower() == "eps":
+                if extension.lower() in ["eps", "pdf", "svg", "psd"]:
                     new_base_path = original_base_path.replace(self.inputDir, self.outputDir)
                     if not os.path.exists(new_base_path):
                             os.makedirs(new_base_path)

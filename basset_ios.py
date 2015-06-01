@@ -31,9 +31,9 @@ class Basset:
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Converts raw assets to proper PNG(s).')
-    parser.add_argument('-d', '--xcassets_dir', default="Resources/Images.xcassets",
+    parser.add_argument('-x', '--xcassets_dir', default="Resources/Images.xcassets",
                         help='path to directory with default xcassets directory')
-    parser.add_argument('-a', '--raw_assets_dir', default="Resources/Assets",
+    parser.add_argument('-r', '--raw_assets_dir', default="Resources/Assets",
                         help='path to directory with raw, vector based graphics')
     parser.add_argument('-g', '--generated_assets_dir', default="Resources/GeneratedAssets",
                         help='path to directory where generated PNGs will be stored')

@@ -2,7 +2,7 @@ from unittest import TestCase
 from Helpers.configuration_manager import BassetConfiguration
 from Helpers.converter import Converter
 from Helpers.merger import Merger
-from basset import Basset
+from basset_ios import Basset
 from mock import MagicMock, Mock, call
 
 
