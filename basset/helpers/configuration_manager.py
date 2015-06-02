@@ -1,23 +1,9 @@
 import os
+import logging
+
 import yaml
-import coloredlogs, logging
-
-
-class NoConfigurationProvidedException(Exception):
-    pass
-
-
-class NoConfigFileFoundException(Exception):
-    pass
-
-
-class NotCompleteConfigurationInConfigFileException(Exception):
-    pass
-
-
-class NotAllConfigurationParametersPresentException(Exception):
-    pass
-
+import coloredlogs
+from basset.exceptions import *
 
 class BassetConfiguration:
     def __init__(self):
@@ -44,15 +30,15 @@ class ConfigurationManager:
         configuration = BassetConfiguration()
 
         if not xcassets_dir and not raw_assets and not generated_assets_dir and not merge_with_xcassets and not config_file_path:
-            raise NoConfigurationProvidedException
+            raise NoConfigurationProvidedException()
 
         if not config_file_path and (
-                                not xcassets_dir or not raw_assets or not generated_assets_dir or not merge_with_xcassets):
-            raise NotAllConfigurationParametersPresentException
+                            not xcassets_dir or not raw_assets or not generated_assets_dir or not merge_with_xcassets):
+            raise NotAllConfigurationParametersPresentException()
 
         if config_file_path:
             if not os.path.isfile(config_file_path):
-                raise NoConfigFileFoundException
+                raise NoConfigFileFoundException()
 
             yml_file = open(config_file_path)
             yml_config_dict = yaml.load(yml_file)
@@ -60,7 +46,7 @@ class ConfigurationManager:
 
             if not yml_config_dict or not all(k in yml_config_dict for k in (
                     "xcassets_dir", "raw_assets", "generated_assets_dir", "merge_with_xcassets")):
-                raise NotCompleteConfigurationInConfigFileException
+                raise NotCompleteConfigurationInConfigFileException()
 
             logging.info("Using configuration from " + config_file_path + " file")
             configuration.xcassets_dir = yml_config_dict['xcassets_dir']

@@ -1,7 +1,10 @@
 import argparse
 import os
 import shutil
-import coloredlogs, logging
+import logging
+
+import coloredlogs
+import sys
 from wand.image import Image
 
 
@@ -26,7 +29,7 @@ class Converter:
                 if extension.lower() in ["eps", "pdf", "svg", "psd"]:
                     new_base_path = original_base_path.replace(self.inputDir, self.outputDir)
                     if not os.path.exists(new_base_path):
-                            os.makedirs(new_base_path)
+                        os.makedirs(new_base_path)
                     original_full_path = os.path.join(original_base_path, original_filename)
 
                     logging.info("Converting " + original_full_path)
@@ -43,16 +46,18 @@ class Converter:
 
         logging.info("Images conversion finished. Converted " + str(converted_files_count) + " images")
 
-
-if __name__ == '__main__':
+def main(args_to_parse):
     parser = argparse.ArgumentParser(description='Converts raw assets to proper PNG(s).')
     parser.add_argument('-i', '--input_dir', default="./Assets", help='directory with raw assets')
     parser.add_argument('-o', '--output_dir', default="./GeneratedAssets",
                         help='directory where generated PNG(s) will be stored')
-    args = parser.parse_args()
+    parsed_args = parser.parse_args(args_to_parse)
 
     converter = Converter()
-    converter.inputDir = args.input_dir
-    converter.outputDir = args.output_dir
+    converter.inputDir = parsed_args.input_dir
+    converter.outputDir = parsed_args.output_dir
     converter.convert()
 
+if __name__ == '__main__':
+    args = sys.argv[1:]
+    main(args)

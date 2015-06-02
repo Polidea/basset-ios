@@ -3,8 +3,11 @@ import shutil
 import tempfile
 import json
 from unittest import TestCase
+
 from nose.tools import assert_raises
-from Helpers.merger import Merger, NoXCAssetsFoundException, NoDefaultXCAssetFoundException
+
+from basset.helpers.merger import Merger
+from basset.exceptions import *
 
 
 class TestMerger(TestCase):
@@ -22,7 +25,7 @@ class TestMerger(TestCase):
 
     def setUp(self):
         self.temp_dir_path = tempfile.mkdtemp()
-        shutil.copytree(os.path.join(TestMerger.script_root_dir_path, "Tests/Resources/tests_merger/SampleAssets"),
+        shutil.copytree(os.path.join(TestMerger.script_root_dir_path, "basset/tests/Resources/tests_merger/SampleAssets"),
                         os.path.join(self.temp_dir_path, self.resources_path))
         os.chdir(self.temp_dir_path)
         pass
@@ -32,8 +35,9 @@ class TestMerger(TestCase):
         shutil.rmtree(self.temp_dir_path)
 
     def test_no_xcassets(self):
-        shutil.copytree(os.path.join(TestMerger.script_root_dir_path, "Tests/Resources/tests_merger/NoXCAssetsTestResources"),
-                        os.path.join(self.temp_dir_path, "Project"))
+        shutil.copytree(
+            os.path.join(TestMerger.script_root_dir_path, "basset/tests/Resources/tests_merger/NoXCAssetsTestResources"),
+            os.path.join(self.temp_dir_path, "Project"))
 
         merger = Merger()
         merger.source_assets_dir = "Assets"
@@ -42,7 +46,7 @@ class TestMerger(TestCase):
 
     def test_multiple_xcassets_no_default(self):
         shutil.copytree(os.path.join(TestMerger.script_root_dir_path,
-                                     "Tests/Resources/tests_merger/MultipleXCAssetsWithoutDefaultTestResources"),
+                                     "basset/tests/Resources/tests_merger/MultipleXCAssetsWithoutDefaultTestResources"),
                         os.path.join(self.temp_dir_path, "Project"))
 
         merger = Merger()
@@ -53,7 +57,7 @@ class TestMerger(TestCase):
 
     def test_single_asset(self):
         shutil.copytree(
-            os.path.join(TestMerger.script_root_dir_path, "Tests/Resources/tests_merger/SingleXCAssetTestResources"),
+            os.path.join(TestMerger.script_root_dir_path, "basset/tests/Resources/tests_merger/SingleXCAssetTestResources"),
             os.path.join(self.temp_dir_path, "Project"))
         selected_asset_dir = "Project/SingleXCAssetsTest/Images.xcassets"
 
@@ -68,7 +72,7 @@ class TestMerger(TestCase):
 
     def test_multiple_assets_with_default(self):
         shutil.copytree(os.path.join(TestMerger.script_root_dir_path,
-                                     "Tests/Resources/tests_merger/MultipleXCAssetsIncludingDefaultTestResources"),
+                                     "basset/tests/Resources/tests_merger/MultipleXCAssetsIncludingDefaultTestResources"),
                         os.path.join(self.temp_dir_path, "Project"))
         selected_asset_dir = "Project/MultipleXCAssetsIncludingDefault/Images.xcassets"
         secondary_assets_dir = os.path.join(self.temp_dir_path,
@@ -86,7 +90,7 @@ class TestMerger(TestCase):
 
     def test_multiple_assets_with_existing_asset(self):
         shutil.copytree(os.path.join(TestMerger.script_root_dir_path,
-                                     "Tests/Resources/tests_merger/MultipleXCAssetsWithAssetThatNeedsUpdatingResources"),
+                                     "basset/tests/Resources/tests_merger/MultipleXCAssetsWithAssetThatNeedsUpdatingResources"),
                         os.path.join(self.temp_dir_path, "Project"))
         selected_asset_dir = "Project/MultipleXCAssetsWithAssetThatNeedsUpdating/Images.xcassets"
         secondary_assets_dir = os.path.join(self.temp_dir_path,

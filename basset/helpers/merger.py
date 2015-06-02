@@ -2,16 +2,11 @@ import argparse
 import json
 import os
 import shutil
-import coloredlogs, logging
+import logging
 
-
-class NoXCAssetsFoundException(Exception):
-    pass
-
-
-class NoDefaultXCAssetFoundException(Exception):
-    pass
-
+import coloredlogs
+import sys
+from basset.exceptions import *
 
 class Merger:
     def __init__(self):
@@ -32,14 +27,14 @@ class Merger:
 
         xcassets_count = len(xcassets_list)
         if xcassets_count == 0:
-            raise NoXCAssetsFoundException
+            raise NoXCAssetsFoundException()
         elif xcassets_count == 1:
             selected_xcassets = xcassets_list[0]
         elif xcassets_count >= 2:
             if self.default_xcasset_dir in xcassets_list:
                 selected_xcassets = self.default_xcasset_dir
             else:
-                raise NoDefaultXCAssetFoundException(str(xcassets_count))
+                raise NoDefaultXCAssetFoundException(xcassets_count)
         return selected_xcassets
 
     def merge(self):
@@ -89,7 +84,8 @@ class Merger:
                     for index, scaled_image_dict in enumerate(contents_json["images"]):
                         needed_keys_present = all(k in scaled_image_dict for k in ("idiom", "scale"))
                         if needed_keys_present:
-                            is_universal_asset_with_scale = scaled_image_dict["idiom"] == "universal" and scaled_image_dict["scale"] == asset_scale
+                            is_universal_asset_with_scale = scaled_image_dict["idiom"] == "universal" and \
+                                                            scaled_image_dict["scale"] == asset_scale
                             if is_universal_asset_with_scale:
                                 contents_json["images"][index]["filename"] = filename
                                 image_found = True
@@ -115,17 +111,19 @@ class Merger:
 
         logging.info("Finished merging with xcassets folder. Merged " + str(merged_files_count) + " files.")
 
-
-if __name__ == '__main__':
+def main(args_to_parse):
     parser = argparse.ArgumentParser(description='Converts raw assets to proper PNG(s).')
     parser.add_argument('-a', '--assets_dir', default="./GeneratedAssets",
                         help='path to directory with generated assets')
     parser.add_argument('-d', '--default_xcassets_dir', default="./GeneratedAssets",
                         help='path to default XCAssets directory')
-    args = parser.parse_args()
+    parsed_args = parser.parse_args(args_to_parse)
 
     merger = Merger()
-    merger.source_assets_dir = args.assets_dir
-    merger.default_xcasset_dir = args.default_xcasset_dir
+    merger.source_assets_dir = parsed_args.assets_dir
+    merger.default_xcasset_dir = parsed_args.default_xcasset_dir
     Merger.merge()
 
+if __name__ == '__main__':
+    args = sys.argv[1:]
+    main(args)

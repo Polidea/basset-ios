@@ -2,8 +2,10 @@ import os
 import shutil
 import tempfile
 from unittest import TestCase
-from Helpers.converter import Converter
+
 from wand.image import Image
+
+from basset.helpers.converter import Converter
 
 
 class TestConverter(TestCase):
@@ -23,7 +25,7 @@ class TestConverter(TestCase):
     def setUp(self):
         self.temp_dir_path = tempfile.mkdtemp()
         os.mkdir(os.path.join(self.temp_dir_path, self.converter_output_tests_resource_path))
-        shutil.copytree(os.path.join(TestConverter.script_root_dir_path, "Tests/Resources/tests_converter"), os.path.join(self.temp_dir_path, self.converter_tests_resource_path))
+        shutil.copytree(os.path.join(TestConverter.script_root_dir_path, "basset/tests/Resources/tests_converter"), os.path.join(self.temp_dir_path, self.converter_tests_resource_path))
         os.chdir(self.temp_dir_path)
 
     def tearDown(self):

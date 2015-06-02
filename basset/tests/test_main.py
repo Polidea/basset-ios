@@ -1,9 +1,11 @@
 from unittest import TestCase
-from Helpers.configuration_manager import BassetConfiguration
-from Helpers.converter import Converter
-from Helpers.merger import Merger
-from basset_ios import Basset
-from mock import MagicMock, Mock, call
+
+from mock import Mock
+
+from basset.helpers.configuration_manager import BassetConfiguration
+from basset.helpers.converter import Converter
+from basset.helpers.merger import Merger
+from basset.basset_ios import Basset
 
 
 class TestBasset(TestCase):

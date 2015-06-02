@@ -3,9 +3,8 @@ import shutil
 import tempfile
 from unittest import TestCase
 
-from Helpers.configuration_manager import ConfigurationManager, NoConfigurationProvidedException, \
-    NoConfigFileFoundException, NotCompleteConfigurationInConfigFileException, \
-    NotAllConfigurationParametersPresentException
+from basset.exceptions import *
+from basset.helpers.configuration_manager import ConfigurationManager
 
 
 class TestConfigurationManager(TestCase):
@@ -18,7 +17,7 @@ class TestConfigurationManager(TestCase):
 
     def setUp(self):
         self.temp_dir_path = tempfile.mkdtemp()
-        shutil.copytree("./Tests/Resources/tests_configuration_manager",
+        shutil.copytree("basset/tests/Resources/tests_configuration_manager",
                         os.path.join(self.temp_dir_path, self.config_files_path))
 
     def tearDown(self):
@@ -53,28 +52,41 @@ class TestConfigurationManager(TestCase):
         self.assertTrue(configuration.merge_with_xcassets == False)
 
     def test_fail_when_there_are_no_parameters_and_config_file(self):
-        self.assertRaises(NoConfigurationProvidedException, ConfigurationManager.get_configuration, None, None, None, None, None)
+        self.assertRaises(NoConfigurationProvidedException, ConfigurationManager.get_configuration, None, None, None,
+                          None, None)
 
     def test_fail_when_provided_config_file_does_not_exist(self):
         self.assertRaises(NoConfigFileFoundException, ConfigurationManager.get_configuration, None, None, None, None,
                           "blah_blah_blah")
 
     def test_fail_when_there_is_empty_config_file(self):
-        self.assertRaises(NotCompleteConfigurationInConfigFileException, ConfigurationManager.get_configuration, None, None, None, None,
-                          config_file_path=os.path.join(self.config_files_path, os.path.join(self.temp_dir_path, self.config_files_path, "empty.yml")))
+        self.assertRaises(NotCompleteConfigurationInConfigFileException, ConfigurationManager.get_configuration, None,
+                          None, None, None,
+                          config_file_path=os.path.join(self.config_files_path,
+                                                        os.path.join(self.temp_dir_path, self.config_files_path,
+                                                                     "empty.yml")))
 
     def test_fail_when_there_are_not_enough_parameters_in_config_file(self):
-        self.assertRaises(NotCompleteConfigurationInConfigFileException, ConfigurationManager.get_configuration, None, None, None, None,
-                          config_file_path=os.path.join(self.config_files_path, os.path.join(self.temp_dir_path, self.config_files_path, "half_empty.yml")))
+        self.assertRaises(NotCompleteConfigurationInConfigFileException, ConfigurationManager.get_configuration, None,
+                          None, None, None,
+                          config_file_path=os.path.join(self.config_files_path,
+                                                        os.path.join(self.temp_dir_path, self.config_files_path,
+                                                                     "half_empty.yml")))
 
     def test_fail_when_not_all_parameters_are_provided(self):
-        self.assertRaises(NotAllConfigurationParametersPresentException, ConfigurationManager.get_configuration, None, "b", "c", "d", config_file_path=None)
-        self.assertRaises(NotAllConfigurationParametersPresentException,ConfigurationManager.get_configuration, "", "b", "c", "d", config_file_path=None)
-        self.assertRaises(NotAllConfigurationParametersPresentException,ConfigurationManager.get_configuration, "a", None, "c", "d", config_file_path=None)
-        self.assertRaises(NotAllConfigurationParametersPresentException,ConfigurationManager.get_configuration, "a", "", "c", "d", config_file_path=None)
-        self.assertRaises(NotAllConfigurationParametersPresentException,ConfigurationManager.get_configuration, "a", "b", None, "d", config_file_path=None)
-        self.assertRaises(NotAllConfigurationParametersPresentException,ConfigurationManager.get_configuration, "a", "b", "", "d", config_file_path=None)
-        self.assertRaises(NotAllConfigurationParametersPresentException,ConfigurationManager.get_configuration, "a", "b", "c", None, config_file_path=None)
-        self.assertRaises(NotAllConfigurationParametersPresentException,ConfigurationManager.get_configuration, "a", "b", "c", "", config_file_path=None)
-        self.assertRaises(NotAllConfigurationParametersPresentException,ConfigurationManager.get_configuration, "a", "b", "c", None, config_file_path=None)
-        self.assertRaises(NotAllConfigurationParametersPresentException,ConfigurationManager.get_configuration, "a", "b", "c", "", config_file_path=None)
+        wrong_args_sets = (
+            (None, "b", "c", "d"),
+            ("", "b", "c", "d"),
+            ( "a", None, "c", "d"),
+            ( "a", "", "c", "d"),
+            ( "a", "b", None, "d"),
+            ( "a", "b", "", "d"),
+            ( "a", "b", "c", None),
+            ( "a", "b", "c", ""),
+            ( "a", "b", "c", None),
+            ( "a", "b", "c", ""),
+        )
+
+        for wrong_args in wrong_args_sets:
+            self.assertRaises(NotAllConfigurationParametersPresentException, ConfigurationManager.get_configuration,
+                              *wrong_args, config_file_path=None)
