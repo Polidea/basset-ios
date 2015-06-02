@@ -34,7 +34,9 @@ TBD
 
 ##Usage
 
-In order to use **Basset** you need to tell which directory you're using to store vecotr images, where generated PNGs will be store etc. You can do this by following naming convention written below, or by specifying explicit configuration via command line parameters or dedicated configuration file.
+In order to use **Basset** you need to tell which directory you're using to store vector images, where generated PNGs will be store etc. You can do this by following naming convention written below, or by specifying explicit configuration via command line parameters or dedicated configuration file.
+
+Remember that you'll have to create .xcassets directory that you want to use **on your own**. If you'll have more than one .xcassets in your project, you'll need to specify which one you want **Basset** to operate on.
 
 ### Naming convention
 
@@ -88,6 +90,10 @@ optional arguments:
   -m, --merge_with_xcassets MERGE_WITH_XCASSETS		will script process xcassets directories
   -c, --config CONFIG								path to config file
 ```                        
+
+### Example
+
+TBD 
 
 
 ###License
