@@ -1,0 +1,3 @@
+#!/bin/sh
+
+python ../basset/basset_ios.py $@
