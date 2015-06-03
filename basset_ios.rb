@@ -1,14 +1,13 @@
-class Basset_ios < Formula
+class BassetIos < Formula
     homepage "https://github.com/Polidea/basset-ios"
-    url "https://github.com/Polidea/basset-ios/releases/download/0.1/basset_ios.zip"
-    sha1 "5d914431966449af7a7aa85f091f161d4a3c2fa8"
-    version "0.1"
-    
+    url "https://github.com/Polidea/basset-ios/archive/0.1.tar.gz"
+    sha1 "054fbb255c9a1daf7666466132469528f685b623"
+
     depends_on :python if MacOS.version <= :snow_leopard
-    
+
     resource "coloredlogs" do
-    url "https://pypi.python.org/packages/source/c/coloredlogs/coloredlogs-1.0.tar.gz"
-    sha1 "3ee63fac5640c9c8185814634f32656f837ee90d"
+        url "https://pypi.python.org/packages/source/c/coloredlogs/coloredlogs-1.0.tar.gz"
+        sha1 "3ee63fac5640c9c8185814634f32656f837ee90d"
     end
 
     resource "Wand" do
@@ -23,14 +22,17 @@ class Basset_ios < Formula
 
     def install
         ENV.prepend_create_path "PYTHONPATH", libexec/"vendor/lib/python2.7/site-packages"
-        %w[coloredlogs Wand PyYAML`].each do |r|
-            resource(r).stage do
-                system "python", *Language::Python.setup_install_args(libexec/"vendor")
-            end
+        resources.each do |r|
+          r.stage do
+            system "python", *Language::Python.setup_install_args(libexec/"vendor")
+          end
         end
-        ENV.prepend_create_path "PYTHONPATH", libexec/"lib/python2.7/site-packages"
-        system "python", *Language::Python.setup_install_args(libexec)
-        bin.install Dir[libexec/"bin/*"]
+
+        ENV.prepend_create_path "PYTHONPATH", libexec
+
+        libexec.install Dir["basset"]
+        bin.install "basset_ios"
+
         bin.env_script_all_files(libexec/"bin", :PYTHONPATH => ENV["PYTHONPATH"])
     end
 
