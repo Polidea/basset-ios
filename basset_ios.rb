@@ -1,7 +1,7 @@
 class BassetIos < Formula
     homepage "https://github.com/Polidea/basset-ios"
     url "https://github.com/Polidea/basset-ios/archive/0.1.tar.gz"
-    sha1 "054fbb255c9a1daf7666466132469528f685b623"
+    sha1 "070af16cf4321aed6c65bd9a4dac8e6f2c003639"
 
     depends_on :python if MacOS.version <= :snow_leopard
     depends_on "imagemagick"
