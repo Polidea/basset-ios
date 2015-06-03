@@ -4,6 +4,7 @@ class BassetIos < Formula
     sha1 "054fbb255c9a1daf7666466132469528f685b623"
 
     depends_on :python if MacOS.version <= :snow_leopard
+    depends_on "imagemagick"
 
     resource "coloredlogs" do
         url "https://pypi.python.org/packages/source/c/coloredlogs/coloredlogs-1.0.tar.gz"
