@@ -7,34 +7,34 @@ class BassetException(Exception):
         pass
 
 
-class NoConfigurationProvidedException(Exception):
+class NoConfigurationProvidedException(BassetException):
     def get_message(self):
         return "No configuration provided!"
 
 
-class NoConfigFileFoundException(Exception):
+class NoConfigFileFoundException(BassetException):
     def get_message(self):
         return "Config file not found!"
 
 
-class NotCompleteConfigurationInConfigFileException(Exception):
+class NotCompleteConfigurationInConfigFileException(BassetException):
     def get_message(self):
         return "Config file broken!"
 
 
-class NotAllConfigurationParametersPresentException(Exception):
+class NotAllConfigurationParametersPresentException(BassetException):
     def get_message(self):
         return "Not all config parameters found!"
 
 
-class NoXCAssetsFoundException(Exception):
+class NoXCAssetsFoundException(BassetException):
     def get_message(self):
         return "No xcassets found"
 
 
-class NoDefaultXCAssetFoundException(Exception):
+class NoDefaultXCAssetFoundException(BassetException):
     def __init__(self, assets_count):
         self.assets_count = assets_count
 
     def get_message(self):
-        return "Found {0} xcassets, but none of them is default one!".str(self.assets_count)
+        return "Found {0} xcassets, but none of them is default one!".format(str(self.assets_count))
