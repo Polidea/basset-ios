@@ -1,11 +1,11 @@
+from _ast import operator
+
 import os
 import shutil
 import tempfile
 import json
 from unittest import TestCase
-
 from nose.tools import assert_raises
-
 from basset.helpers.merger import Merger
 from basset.exceptions import *
 
@@ -25,8 +25,9 @@ class TestMerger(TestCase):
 
     def setUp(self):
         self.temp_dir_path = tempfile.mkdtemp()
-        shutil.copytree(os.path.join(TestMerger.script_root_dir_path, "basset/tests/Resources/tests_merger/SampleAssets"),
-                        os.path.join(self.temp_dir_path, self.resources_path))
+        shutil.copytree(
+            os.path.join(TestMerger.script_root_dir_path, "basset/tests/Resources/tests_merger/SampleAssets"),
+            os.path.join(self.temp_dir_path, self.resources_path))
         os.chdir(self.temp_dir_path)
         pass
 
@@ -36,7 +37,8 @@ class TestMerger(TestCase):
 
     def test_no_xcassets(self):
         shutil.copytree(
-            os.path.join(TestMerger.script_root_dir_path, "basset/tests/Resources/tests_merger/NoXCAssetsTestResources"),
+            os.path.join(TestMerger.script_root_dir_path,
+                         "basset/tests/Resources/tests_merger/NoXCAssetsTestResources"),
             os.path.join(self.temp_dir_path, "Project"))
 
         merger = Merger()
@@ -57,7 +59,8 @@ class TestMerger(TestCase):
 
     def test_single_asset(self):
         shutil.copytree(
-            os.path.join(TestMerger.script_root_dir_path, "basset/tests/Resources/tests_merger/SingleXCAssetTestResources"),
+            os.path.join(TestMerger.script_root_dir_path,
+                         "basset/tests/Resources/tests_merger/SingleXCAssetTestResources"),
             os.path.join(self.temp_dir_path, "Project"))
         selected_asset_dir = "Project/SingleXCAssetsTest/Images.xcassets"
 
@@ -142,8 +145,8 @@ class TestMerger(TestCase):
         with open(os.path.join(os.path.join(self.temp_dir_path, selected_asset_dir),
                                "test-01.imageset/Contents.json")) as data_file:
             actual_dict = json.load(data_file)
-            actual_dict = self.deep_sort(actual_dict)
-            expected_dict = self.deep_sort(expected_dict)
+            actual_dict["images"] = sorted(actual_dict["images"], key=lambda k: k["filename"])
+            expected_dict["images"] = sorted(expected_dict["images"], key=lambda k: k["filename"])
             self.assertDictEqual(expected_dict, actual_dict)
 
         self.assertTrue(os.path.isdir(secondary_assets_dir))
@@ -151,26 +154,6 @@ class TestMerger(TestCase):
 
     # Helpers-----------------------------------------------------------------------------------------------------------
 
-    def deep_sort(self, obj):
-        """
-        Recursively sort list or dict nested lists
-        """
-
-        if isinstance(obj, dict):
-            _sorted = {}
-            for key in sorted(obj):
-                _sorted[key] = self.deep_sort(obj[key])
-
-        elif isinstance(obj, list):
-            new_list = []
-            for val in obj:
-                new_list.append(self.deep_sort(val))
-            _sorted = sorted(new_list)
-
-        else:
-            _sorted = obj
-
-        return _sorted
 
     def check_if_images_are_copied_and_jsons_are_valid(self, selected_asset_dir,
                                                        file_excluded_from_json_validation_index):
@@ -254,8 +237,8 @@ class TestMerger(TestCase):
 
         with open(json_file_path) as data_file:
             actual_dict = json.load(data_file)
-            actual_dict = self.deep_sort(actual_dict)
-            expected_dict = self.deep_sort(expected_dict)
+            actual_dict["images"] = sorted(actual_dict["images"], key=lambda k: k["filename"])
+            expected_dict["images"] = sorted(expected_dict["images"], key=lambda k: k["filename"])
             self.assertDictEqual(expected_dict, actual_dict)
 
     def check_if_images_are_copied(self, source_images, destination_directory_path):

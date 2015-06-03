@@ -4,9 +4,9 @@ import logging
 import coloredlogs
 import sys
 
-from helpers.configuration_manager import ConfigurationManager
+from basset.helpers.configuration_manager import ConfigurationManager
 
-from helpers.converter import Converter
+from basset.helpers.converter import Converter
 from basset.helpers.merger import Merger
 from basset.exceptions import *
 
