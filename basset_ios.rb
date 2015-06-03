@@ -21,6 +21,11 @@ class BassetIos < Formula
         sha1 "1a2d5df8b31124573efb9598ec6d54767f3c4cd4"
     end
 
+    resource "humanfriendly" do
+        url "https://pypi.python.org/packages/source/h/humanfriendly/humanfriendly-1.26.tar.gz"
+        sha1 "90bb0dec1be538f8b07764c15079eddc4d5dcfb6"
+    end
+
     def install
         ENV.prepend_create_path "PYTHONPATH", libexec/"vendor/lib/python2.7/site-packages"
         resources.each do |r|
