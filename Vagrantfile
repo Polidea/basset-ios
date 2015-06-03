@@ -5,8 +5,11 @@
 $script = <<SCRIPT
     # Install system requirements
     apt-get update -y
-    apt-get install -y git python2.7 python-pip python2.7-dev libmagickwand-dev
+    apt-get install -y git python2.7 python-pip python2.7-dev libmagickwand-dev python3-pip
     pip install -r /vagrant/requirements.txt
+    pip install tox
+    pip3 install -r /vagrant/requirements.txt
+    pip3 install tox
 SCRIPT
 
 # Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
