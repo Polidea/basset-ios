@@ -7,7 +7,7 @@
 Main features of **Basset** can be describd in two steps:
 
 1. Converting vector images (.eps, .pdf, .psd, .svg) to PNG(s) with resolutions and names properly recognized by iOS apps (@2x, @3x etc.)
-2. Copying assets from previous steps to selected .xcasset files
+2. Copying assets from previous steps to selected .xcasset files and creating proper JSONs there.
 
 
 ####Why just don't use XCode's PDF support?
