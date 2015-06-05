@@ -2,9 +2,9 @@ import argparse
 import os
 import shutil
 import logging
+import sys
 
 import coloredlogs
-import sys
 from wand.image import Image
 
 
@@ -35,16 +35,25 @@ class Converter:
                     logging.info("Converting " + original_full_path)
                     converted_files_count += 1
 
+                    original_size = (0, 0)
                     with Image(filename=original_full_path) as img:
+                        original_size = img.size
+
+                    image_size_1x = (original_size[0], original_size[0])
+                    image_size_2x = (original_size[0] * 2, original_size[0] * 2)
+                    image_size_3x = (original_size[0] * 3, original_size[0] * 3)
+                    with Image(filename=original_full_path, resolution=image_size_1x) as img:
+                        img.resize(*image_size_1x)
                         img.save(filename=os.path.join(new_base_path, basename + ".png"))
-                    with Image(filename=original_full_path) as img:
-                        img.resize(img.width * 2, img.height * 2)
+                    with Image(filename=original_full_path, resolution=image_size_2x) as img:
+                        img.resize(*image_size_2x)
                         img.save(filename=os.path.join(new_base_path, basename + "@2x.png"))
-                    with Image(filename=original_full_path) as img:
-                        img.resize(img.width * 3, img.height * 3)
+                    with Image(filename=original_full_path, resolution=image_size_3x) as img:
+                        img.resize(*image_size_3x)
                         img.save(filename=os.path.join(new_base_path, basename + "@3x.png"))
 
         logging.info("Images conversion finished. Converted " + str(converted_files_count) + " images")
+
 
 def main(args_to_parse):
     parser = argparse.ArgumentParser(description='Converts raw assets to proper PNG(s).')
@@ -57,6 +66,7 @@ def main(args_to_parse):
     converter.inputDir = parsed_args.input_dir
     converter.outputDir = parsed_args.output_dir
     converter.convert()
+
 
 if __name__ == '__main__':
     args = sys.argv[1:]
