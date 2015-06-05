@@ -9,6 +9,12 @@ Main features of **Basset** can be describd in two steps:
 1. Converting vector images (.eps, .pdf, .psd, .svg) to PNG(s) with resolutions and names properly recognized by iOS apps (@2x, @3x etc.)
 2. Copying assets from previous steps to selected .xcasset files
 
+
+####Why just don't use XCode's PDF support?
+
+1. Each PDF what is drag-and-dropped to XCode is assigned to @1x category in xcassets. For each of them you need to drag them again to "All" category, what is really painful when you're using hundreads of images in your projects.
+2. Check of this link: [http://bjango.com/articles/idontusepdfs/](http://bjango.com/articles/idontusepdfs/)
+
 ##Getting started
 
 ###Prerequisites
@@ -101,11 +107,11 @@ optional arguments:
 
 1) First of all create new iOS project. Make sure it contains *xcassets* folder inside.
 
-![image](readme_resources/1.png =300x) 
+<img src="./readme_resources/1.png" style="width: 300px;"/>
 
 2) Create Assets folder, and put all your vector images in there.
 
-![image](readme_resources/2.png =200x)
+<img src="./readme_resources/2.png" style="width: 200px;"/>
 
 3) Create config file:
 
@@ -118,7 +124,7 @@ merge_with_xcassets: True
 
 and save it as config.yml in project root folder:
 
-![image](readme_resources/3.png =200x)
+<img src="./readme_resources/3.png" style="width: 200px;"/>
 
 4) Open terminal, change current directory to your iOS project, and type:
 
@@ -128,11 +134,11 @@ basset_ios -c config.yml
 
 5) All vector images should be converted to PNGs and put into selected ```xcassets``` folder.
 
-![image](readme_resources/5.png =600x)
+<img src="./readme_resources/5.png" style="width: 600px;"/>
 
 All images are now visible in XCode:
 
-![image](readme_resources/4.png =600x)
+<img src="./readme_resources/4.png" style="width: 600px;"/>
 
 ##License
 Basset-ios is released under a MIT License. See LICENSE file for details.
