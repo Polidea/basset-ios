@@ -34,6 +34,7 @@ It should also work on other Unix-like system, but it wasn't tested there.
 Open your terminal and type
 
 ```
+brew tap Polidea/tap
 brew install basset_ios
 ```
 
