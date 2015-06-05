@@ -18,13 +18,19 @@ Main features of **Basset** can be describd in two steps:
 * OSX (tested on Yosemite)
 * Homebrew or docker installed 
 
+It should also work on other Unix-like system, but it wasn't tested there.
+
+
 ###Installation
 
 ####Homebrew
 
+Open your terminal and type
+
 ```
-TBD
+brew install basset_ios
 ```
+
 
 ####Docker
 
@@ -91,10 +97,42 @@ optional arguments:
   -c, --config CONFIG								path to config file
 ```                        
 
-### Example
+## Example
 
-TBD 
+1) First of all create new iOS project. Make sure it contains *xcassets* folder inside.
 
+![image](readme_resources/1.png =300x) 
 
-###License
+2) Create Assets folder, and put all your vector images in there.
+
+![image](readme_resources/2.png =200x)
+
+3) Create config file:
+
+```
+xcassets_dir: test_basset/Images.xcassets
+raw_assets: Assets
+generated_assets_dir: GeneratedAssets
+merge_with_xcassets: True
+``` 
+
+and save it as config.yml in project root folder:
+
+![image](readme_resources/3.png =200x)
+
+4) Open terminal, change current directory to your iOS project, and type:
+
+```
+basset_ios -c config.yml
+```
+
+5) All vector images should be converted to PNGs and put into selected ```xcassets``` folder.
+
+![image](readme_resources/5.png =600x)
+
+All images are now visible in XCode:
+
+![image](readme_resources/4.png =600x)
+
+##License
 Basset-ios is released under a MIT License. See LICENSE file for details.
