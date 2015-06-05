@@ -2,8 +2,8 @@ class BassetIos < Formula
 
     desc "Converting vector images to PNG(s) and organizes them in xcassets"
     homepage "https://github.com/Polidea/basset-ios"
-    url "https://github.com/Polidea/basset-ios/archive/0.1.tar.gz"
-    sha1 "070af16cf4321aed6c65bd9a4dac8e6f2c003639"
+    url "https://github.com/Polidea/basset-ios/archive/1.0.tar.gz"
+    sha1 "18043152e4642e5baa5aad1c8bd2dda2546edefd"
 
     depends_on :python if MacOS.version <= :snow_leopard
     depends_on "imagemagick" => :build_from_source
@@ -39,6 +39,7 @@ class BassetIos < Formula
 
         ENV.prepend_create_path "PYTHONPATH", libexec
 
+        libexec.install Dir["basset"]
         bin.install "basset_ios"
 
         bin.env_script_all_files(libexec/"bin", :PYTHONPATH => ENV["PYTHONPATH"])
