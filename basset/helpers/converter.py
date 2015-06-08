@@ -7,6 +7,8 @@ import sys
 import coloredlogs
 from wand.image import Image
 
+from basset.exceptions import *
+
 
 class Converter:
     def __init__(self):
@@ -15,7 +17,33 @@ class Converter:
         self.outputDir = None
 
     def convert(self):
+        allowed_image_types = ["eps", "pdf", "svg", "psd"]
         logging.info("Converting vector files from " + self.inputDir + " to " + self.outputDir)
+
+        directories_with_vector_files = {}
+        if not os.path.isdir(self.inputDir):
+            for path, subdirectories, files in os.walk(os.getcwd()):
+                path = os.path.relpath(path, os.getcwd())
+                for original_filename in files:
+                    extension = original_filename.split(".")[1]
+
+                    if extension.lower() in allowed_image_types:
+                        top_dir_in_path = path.split(os.sep)[0]
+                        if top_dir_in_path in directories_with_vector_files:
+                            directories_with_vector_files[top_dir_in_path] += 1
+                        else:
+                            directories_with_vector_files[top_dir_in_path] = 1
+
+            max_vector_files_count = -1
+            directory_with_max_vector_files = None
+            for path in directories_with_vector_files.keys():
+                if directories_with_vector_files is not None:
+                    if directories_with_vector_files[path] > max_vector_files_count:
+                        max_vector_files_count = directories_with_vector_files[path]
+                        directory_with_max_vector_files = path
+
+            raise AssetsDirNotFoundException(directory_with_max_vector_files)
+
         if os.path.isdir(self.outputDir):
             shutil.rmtree(self.outputDir)
 
@@ -26,7 +54,7 @@ class Converter:
                 basename = original_filename.split(".")[0]
                 extension = original_filename.split(".")[1]
 
-                if extension.lower() in ["eps", "pdf", "svg", "psd"]:
+                if extension.lower() in allowed_image_types:
                     new_base_path = original_base_path.replace(self.inputDir, self.outputDir)
                     if not os.path.exists(new_base_path):
                         os.makedirs(new_base_path)
@@ -35,7 +63,6 @@ class Converter:
                     logging.info("Converting " + original_full_path)
                     converted_files_count += 1
 
-                    original_size = (0, 0)
                     with Image(filename=original_full_path) as img:
                         original_size = img.size
 
