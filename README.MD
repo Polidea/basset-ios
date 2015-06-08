@@ -38,6 +38,15 @@ brew tap Polidea/tap
 brew install basset_ios
 ```
 
+####Known issues
+
+in case you've recieved this error:
+
+```
+Error: undefined method `desc' for ...
+```
+
+please make sure you've newest version of homebrew. You can update it by running ```brew update``` command
 
 ####Docker
 
