@@ -38,11 +38,11 @@ class AssetsDirNotFoundException(BassetException):
 
     def get_message(self):
         if self.asset_dir_candidate is None:
-            return "I haven't found any vector assets. In order to use basset, you need to create directory with them and run thi command \n" \
+            return "I haven't found any vector assets. In order to use basset, you need to create directory with them and run this command:\n" \
                "basset_ios -r <assets_directory_path>"
         else:
-            return "I haven't found vector assets directory, but it looks like most of them are in \"{0}\" directory. You can use this directory by running basset with command: \n" \
-               "basset_ios -r {1} \n or create config file.".format(self.asset_dir_candidate)
+            return "I haven't found vector assets directory you've provided, but it looks like most of them are in \"{0}\" directory. You can use this directory by running basset with command: \n" \
+               "basset_ios -r {1} \nor create config file.".format(self.asset_dir_candidate,self.asset_dir_candidate)
 
 
 class NoDefaultXCAssetFoundException(BassetException):
