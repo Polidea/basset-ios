@@ -10,11 +10,33 @@ from wand.image import Image
 from basset.exceptions import *
 
 
+
 class Converter:
     def __init__(self):
         coloredlogs.install()
         self.inputDir = None
         self.outputDir = None
+
+    @staticmethod
+    def sha1_of_file(file_path):
+        import hashlib
+        sha = hashlib.sha1()
+        with open(file_path, 'rb') as f:
+            for line in f:
+                sha.update(line)
+            return sha.hexdigest()
+
+
+    def convert_single_file(self, source_file, destination_file, target_resolution):
+        sha1_of_original_file = self.sha1_of_file(source_file)
+        convert_string = "convert {0} -resize {1}x{2} -density {3}x{4} -set comment {5} {6}".format(source_file,
+                                                                                   target_resolution[0],
+                                                                                   target_resolution[1],
+                                                                                   target_resolution[0],
+                                                                                   target_resolution[1],
+                                                                                   sha1_of_original_file,
+                                                                                   destination_file)
+        os.system(convert_string)
 
     def convert(self):
         allowed_image_types = ["eps", "pdf", "svg", "psd"]
@@ -71,15 +93,10 @@ class Converter:
                         image_size_1x = (original_size[0], original_size[0])
                         image_size_2x = (original_size[0] * 2, original_size[0] * 2)
                         image_size_3x = (original_size[0] * 3, original_size[0] * 3)
-                        with Image(filename=original_full_path, resolution=image_size_1x) as img:
-                            img.resize(*image_size_1x)
-                            img.save(filename=os.path.join(new_base_path, basename + ".png"))
-                        with Image(filename=original_full_path, resolution=image_size_2x) as img:
-                            img.resize(*image_size_2x)
-                            img.save(filename=os.path.join(new_base_path, basename + "@2x.png"))
-                        with Image(filename=original_full_path, resolution=image_size_3x) as img:
-                            img.resize(*image_size_3x)
-                            img.save(filename=os.path.join(new_base_path, basename + "@3x.png"))
+
+                        self.convert_single_file(original_full_path, os.path.join(new_base_path, basename + ".png"), image_size_1x)
+                        self.convert_single_file(original_full_path, os.path.join(new_base_path, basename + "@2x.png"), image_size_2x)
+                        self.convert_single_file(original_full_path, os.path.join(new_base_path, basename + "@3x.png"), image_size_3x)
 
         logging.info("Images conversion finished. Converted " + str(converted_files_count) + " images")
 
