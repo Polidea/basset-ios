@@ -3,12 +3,9 @@ import shutil
 import tempfile
 from unittest import TestCase
 
-from nose.tools import assert_raises
-
 from wand.image import Image
 
 from basset.exceptions import *
-
 from basset.helpers.converter import Converter
 
 
@@ -89,18 +86,6 @@ class TestConverter(TestCase):
             os.path.join(self.converter_output_tests_resource_path, "subfolder", "subsubfolder", "test-05@3x.png"),
             (300, 300))
 
-    def test_clear_output_directory_before_conversion(self):
-        dummy_file_path = os.path.join(self.converter_output_tests_resource_path, "dummy.file")
-        open(dummy_file_path, 'a').close()
-        self.assertTrue(os.path.isfile(dummy_file_path))
-
-        converter = Converter()
-        converter.inputDir = os.path.join(self.converter_tests_resource_path, "convert_test")
-        converter.outputDir = self.converter_output_tests_resource_path
-        converter.convert()
-
-        self.assertFalse(os.path.isfile(dummy_file_path))
-
     def test_should_raise_exception_with_assets_dir_not_present(self):
         converter = Converter()
         os.chdir(os.path.join(self.converter_tests_resource_path, "suggest_asset_diretory_test"))
@@ -124,3 +109,47 @@ class TestConverter(TestCase):
             self.fail("This should fail")
         except AssetsDirNotFoundException as e:
             self.assertEqual(e.asset_dir_candidate, None)
+
+
+    def test_dont_reconvert_old_files_test(self):
+        converter = Converter()
+        os.chdir(os.path.join(self.converter_tests_resource_path, "dont_reconvert_old_files_test"))
+        converter.inputDir = "Assets"
+        converter.outputDir = self.converter_output_tests_resource_path
+
+        converter.convert()
+
+        sha1_of_generated_files = []
+        sha1_of_generated_files.append(converter.sha1_of_file(os.path.join(converter.outputDir, "test-01.png")))
+        sha1_of_generated_files.append(converter.sha1_of_file(os.path.join(converter.outputDir, "test-02.png")))
+
+        shutil.copy2(os.path.join(converter.inputDir, "test-01.eps"), os.path.join(converter.inputDir, "test-02.eps"))
+        converter.convert()
+
+        sha1_of_generated_files.append(converter.sha1_of_file(os.path.join(converter.outputDir, "test-01.png")))
+        sha1_of_generated_files.append(converter.sha1_of_file(os.path.join(converter.outputDir, "test-02.png")))
+
+        self.assertEqual(sha1_of_generated_files[0], sha1_of_generated_files[2])
+        self.assertNotEqual(sha1_of_generated_files[1], sha1_of_generated_files[3])
+
+
+    def test_respect_force_flag(self):
+        converter = Converter()
+        os.chdir(os.path.join(self.converter_tests_resource_path, "dont_reconvert_old_files_test"))
+        converter.inputDir = "Assets"
+        converter.outputDir = self.converter_output_tests_resource_path
+        converter.force_convert = True
+
+        converter.convert()
+
+        sha1_of_generated_files = []
+        sha1_of_generated_files.append(converter.sha1_of_file(os.path.join(converter.outputDir, "test-01.png")))
+        sha1_of_generated_files.append(converter.sha1_of_file(os.path.join(converter.outputDir, "test-02.png")))
+
+        converter.convert()
+
+        sha1_of_generated_files.append(converter.sha1_of_file(os.path.join(converter.outputDir, "test-01.png")))
+        sha1_of_generated_files.append(converter.sha1_of_file(os.path.join(converter.outputDir, "test-02.png")))
+
+        self.assertNotEqual(sha1_of_generated_files[0], sha1_of_generated_files[2])
+        self.assertNotEqual(sha1_of_generated_files[1], sha1_of_generated_files[3])

@@ -13,6 +13,7 @@ class TestBasset(TestCase):
     sample_raw_assets_dir = "sample_raw_assets_dir"
     sample_generated_assets_dir = "sample_generated_assets_dir"
     sample_merge_with = True
+    sample_force_covert = True
 
     def setUp(self):
         pass
@@ -27,6 +28,7 @@ class TestBasset(TestCase):
         configuration.raw_assets = self.sample_raw_assets_dir
         configuration.generated_assets_dir = self.sample_generated_assets_dir
         configuration.merge_with_xcassets = self.sample_merge_with
+        configuration.force_convert = self.sample_force_covert
 
         merger = Merger()
         converter = Converter()
@@ -37,6 +39,7 @@ class TestBasset(TestCase):
 
         self.assertTrue(basset.converter.inputDir == self.sample_raw_assets_dir)
         self.assertTrue(basset.converter.outputDir == self.sample_generated_assets_dir)
+        self.assertTrue(basset.converter.force_convert == self.sample_force_covert)
 
     def test_if_converter_and_merger_methods_are_called_in_order(self):
         configuration = BassetConfiguration()

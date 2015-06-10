@@ -1,8 +1,8 @@
 import argparse
 import os
-import shutil
 import logging
 import sys
+import subprocess
 
 import coloredlogs
 from wand.image import Image
@@ -10,16 +10,17 @@ from wand.image import Image
 from basset.exceptions import *
 
 
-
 class Converter:
     def __init__(self):
         coloredlogs.install()
         self.inputDir = None
         self.outputDir = None
+        self.force_convert = False
 
     @staticmethod
     def sha1_of_file(file_path):
         import hashlib
+
         sha = hashlib.sha1()
         with open(file_path, 'rb') as f:
             for line in f:
@@ -29,13 +30,27 @@ class Converter:
 
     def convert_single_file(self, source_file, destination_file, target_resolution):
         sha1_of_original_file = self.sha1_of_file(source_file)
+
+        if self.force_convert is False and os.path.isfile(destination_file):
+            comment = subprocess.check_output("identify -verbose {0} | grep comment:".format(destination_file),
+                                              shell=True).decode("utf-8")
+            previous_sha1 = comment.replace("comment:", "").strip(" \t\n\r")
+
+            if previous_sha1 == sha1_of_original_file:
+                raise AssetAlreadyGeneratedException()
+
         convert_string = "convert {0} -resize {1}x{2} -density {3}x{4} -set comment {5} {6}".format(source_file,
-                                                                                   target_resolution[0],
-                                                                                   target_resolution[1],
-                                                                                   target_resolution[0],
-                                                                                   target_resolution[1],
-                                                                                   sha1_of_original_file,
-                                                                                   destination_file)
+                                                                                                    target_resolution[
+                                                                                                        0],
+                                                                                                    target_resolution[
+                                                                                                        1],
+                                                                                                    target_resolution[
+                                                                                                        0],
+                                                                                                    target_resolution[
+                                                                                                        1],
+                                                                                                    sha1_of_original_file,
+                                                                                                    destination_file)
+
         os.system(convert_string)
 
     def convert(self):
@@ -67,9 +82,6 @@ class Converter:
 
             raise AssetsDirNotFoundException(directory_with_max_vector_files)
 
-        if os.path.isdir(self.outputDir):
-            shutil.rmtree(self.outputDir)
-
         converted_files_count = 0
 
         for original_base_path, subdirectories, files in os.walk(self.inputDir):
@@ -84,7 +96,6 @@ class Converter:
                             os.makedirs(new_base_path)
                         original_full_path = os.path.join(original_base_path, filename)
 
-                        logging.info("Converting " + original_full_path)
                         converted_files_count += 1
 
                         with Image(filename=original_full_path) as img:
@@ -94,16 +105,26 @@ class Converter:
                         image_size_2x = (original_size[0] * 2, original_size[0] * 2)
                         image_size_3x = (original_size[0] * 3, original_size[0] * 3)
 
-                        self.convert_single_file(original_full_path, os.path.join(new_base_path, basename + ".png"), image_size_1x)
-                        self.convert_single_file(original_full_path, os.path.join(new_base_path, basename + "@2x.png"), image_size_2x)
-                        self.convert_single_file(original_full_path, os.path.join(new_base_path, basename + "@3x.png"), image_size_3x)
+                        try:
+                            self.convert_single_file(original_full_path, os.path.join(new_base_path, basename + ".png"),
+                                                     image_size_1x)
+                            self.convert_single_file(original_full_path,
+                                                     os.path.join(new_base_path, basename + "@2x.png"),
+                                                     image_size_2x)
+                            self.convert_single_file(original_full_path,
+                                                     os.path.join(new_base_path, basename + "@3x.png"),
+                                                     image_size_3x)
+                            logging.info("Converted {0}".format(original_full_path))
+                        except AssetAlreadyGeneratedException:
+                            logging.info("Skipping (already generated) {0}".format(original_full_path))
 
-        logging.info("Images conversion finished. Converted " + str(converted_files_count) + " images")
+        logging.info("Images conversion finished. Processed " + str(converted_files_count) + " images")
 
 
 def main(args_to_parse):
     parser = argparse.ArgumentParser(description='Converts raw assets to proper PNG(s).')
     parser.add_argument('-i', '--input_dir', default="./Assets", help='directory with raw assets')
+    parser.add_argument('-f', '--force_convert', default="False", help='should regenerate assets even when they were generated before')
     parser.add_argument('-o', '--output_dir', default="./GeneratedAssets",
                         help='directory where generated PNG(s) will be stored')
     parsed_args = parser.parse_args(args_to_parse)
@@ -111,6 +132,7 @@ def main(args_to_parse):
     converter = Converter()
     converter.inputDir = parsed_args.input_dir
     converter.outputDir = parsed_args.output_dir
+    converter.outputDir = parsed_args.force_convert
     converter.convert()
 
 

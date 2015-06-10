@@ -23,7 +23,7 @@ class Merger:
 
         logging.info("Found xcassets:")
         for single_xcasset in xcassets_list:
-            logging.info(single_xcasset)
+            logging.info("  " + single_xcasset)
 
         xcassets_count = len(xcassets_list)
         if xcassets_count == 0:

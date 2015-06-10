@@ -6,6 +6,8 @@ class BassetException(Exception):
     def get_message(self):
         pass
 
+class AssetAlreadyGeneratedException(Exception):
+    pass
 
 class NoConfigurationProvidedException(BassetException):
     def get_message(self):

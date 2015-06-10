@@ -2,3 +2,4 @@ xcassets_dir: fake_xcassets_dir
 raw_assets: fake_raw_assets
 generated_assets_dir: fake_generated_assets
 merge_with_xcassets: False
+force_convert: True

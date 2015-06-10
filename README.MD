@@ -88,6 +88,9 @@ generated_assets_dir: GeneratedAssets
 
 # Should generated PNG(s) be merged to xcassets folder
 merge_with_xcassets: True
+
+# Should convert all assets every time
+force_convert: False
 ```
 
 #### Example
@@ -110,6 +113,7 @@ optional arguments:
   -r, --raw_assets_dir RAW_ASSETS_DIR				path to directory with raw, vector based graphics
   -g, --generated_assets_dir GENERATED_ASSETS_DIR	path to directory where generated PNGs will be stored
   -m, --merge_with_xcassets MERGE_WITH_XCASSETS		will script process xcassets directories
+  -f, --force_convert FORCE_CONVERT					should regenerate assets even when they were generated before
   -c, --config CONFIG								path to config file
 ```                        
 
@@ -130,6 +134,7 @@ xcassets_dir: test_basset/Images.xcassets
 raw_assets: Assets
 generated_assets_dir: GeneratedAssets
 merge_with_xcassets: True
+force_convert: False
 ``` 
 
 and save it as config.yml in project root folder:
