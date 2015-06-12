@@ -32,14 +32,14 @@ class Converter:
         sha1_of_original_file = self.sha1_of_file(source_file)
 
         if self.force_convert is False and os.path.isfile(destination_file):
-            comment = subprocess.check_output("identify -verbose {0} | grep comment:".format(destination_file),
+            comment = subprocess.check_output("identify -verbose \"{0}\" | grep comment:".format(destination_file),
                                               shell=True).decode("utf-8")
             previous_sha1 = comment.replace("comment:", "").strip(" \t\n\r")
 
             if previous_sha1 == sha1_of_original_file:
                 raise AssetAlreadyGeneratedException()
 
-        convert_string = "convert {0} -resize {1}x{2} -density {3}x{4} -set comment {5} {6}".format(source_file,
+        convert_string = "convert \"{0}\" -resize {1}x{2} -density {3}x{4} -set comment {5} \"{6}\"".format(source_file,
                                                                                                     target_resolution[
                                                                                                         0],
                                                                                                     target_resolution[
@@ -54,7 +54,7 @@ class Converter:
         os.system(convert_string)
 
     def convert(self):
-        allowed_image_types = ["eps", "pdf", "svg", "psd"]
+        allowed_image_types = ["eps", "pdf", "svg", "psd", "png", "jpg", "jpeg", "gif"]
         logging.info("Converting vector files from " + self.inputDir + " to " + self.outputDir)
 
         directories_with_vector_files = {}
@@ -108,12 +108,14 @@ class Converter:
                         try:
                             self.convert_single_file(original_full_path, os.path.join(new_base_path, basename + ".png"),
                                                      image_size_1x)
-                            self.convert_single_file(original_full_path,
-                                                     os.path.join(new_base_path, basename + "@2x.png"),
-                                                     image_size_2x)
-                            self.convert_single_file(original_full_path,
-                                                     os.path.join(new_base_path, basename + "@3x.png"),
-                                                     image_size_3x)
+                            if not basename.endswith(("@2x", "@3x")):
+                                self.convert_single_file(original_full_path,
+                                                         os.path.join(new_base_path, basename + "@2x.png"),
+                                                         image_size_2x)
+                                self.convert_single_file(original_full_path,
+                                                         os.path.join(new_base_path, basename + "@3x.png"),
+                                                         image_size_3x)
+
                             logging.info("Converted {0}".format(original_full_path))
                         except AssetAlreadyGeneratedException:
                             logging.info("Skipping (already generated) {0}".format(original_full_path))
