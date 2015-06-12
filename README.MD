@@ -1,3 +1,5 @@
+<img src="./readme_resources/basset_bg.png" />
+
 #Basset-ios
 
 [![Build Status](https://travis-ci.org/Polidea/basset-ios.svg?branch=master)](https://travis-ci.org/Polidea/basset-ios)
