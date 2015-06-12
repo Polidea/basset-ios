@@ -13,7 +13,8 @@ Main features of **Basset** can be describd in two steps:
 ####Why just don't use XCode's PDF support?
 
 1. Each PDF what is drag-and-dropped to XCode is assigned to @1x category in xcassets. For each of them you need to drag them again to "All" category, what is really painful when you're using hundreads of images in your projects.
-2. Check of this link: [http://bjango.com/articles/idontusepdfs/](http://bjango.com/articles/idontusepdfs/)
+2. It's easier to manage ordinary directory of assets than .xcassets. You don't have to use XCode to do that. so even non-developers can add resources to the project.
+3. Check of this link: [http://bjango.com/articles/idontusepdfs/](http://bjango.com/articles/idontusepdfs/)
 
 ##Getting started
 
