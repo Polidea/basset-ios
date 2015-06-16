@@ -62,6 +62,7 @@ class Converter:
             for path, subdirectories, files in os.walk(os.getcwd()):
                 path = os.path.relpath(path, os.getcwd())
                 for filename in files:
+
                     if "." in filename:
                         extension = filename.split(".")[1]
 
@@ -85,6 +86,9 @@ class Converter:
         converted_files_count = 0
 
         for original_base_path, subdirectories, files in os.walk(self.inputDir):
+            if original_base_path.endswith(".imageset"):
+                raise AssetsDirContainsImagesetDirectoryException(original_base_path, self.inputDir)
+
             for filename in files:
                 if "." in filename:
                     basename = filename.split(".")[0]

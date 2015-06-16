@@ -115,7 +115,7 @@ def main(args_to_parse):
     parser = argparse.ArgumentParser(description='Converts raw assets to proper PNG(s).')
     parser.add_argument('-a', '--assets_dir', default="./GeneratedAssets",
                         help='path to directory with generated assets')
-    parser.add_argument('-d', '--default_xcassets_dir', default="./GeneratedAssets",
+    parser.add_argument('-d', '--default_xcassets_dir', default="./Assets.xcassets",
                         help='path to default XCAssets directory')
     parsed_args = parser.parse_args(args_to_parse)
 

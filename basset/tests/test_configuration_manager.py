@@ -15,6 +15,7 @@ class TestConfigurationManager(TestCase):
     sample_generated_assets_dir = "sample_generated_assets_dir"
     sample_merge_with = "sample_merge_with_xcassets"
     sample_force_convert = "sample_force_convert"
+    sample_extract_path = "sample_extract_path"
 
     def setUp(self):
         self.temp_dir_path = tempfile.mkdtemp()
@@ -30,12 +31,14 @@ class TestConfigurationManager(TestCase):
                                                                generated_assets_dir=self.sample_generated_assets_dir,
                                                                merge_with_xcassets=self.sample_merge_with,
                                                                force_convert=self.sample_force_convert,
+                                                               extract_path=self.sample_extract_path,
                                                                config_file_path=None)
 
         self.assertTrue(configuration.xcassets_dir == self.sample_xcassets_dir)
         self.assertTrue(configuration.raw_assets == self.sample_raw_assets_dir)
         self.assertTrue(configuration.generated_assets_dir == self.sample_generated_assets_dir)
         self.assertTrue(configuration.merge_with_xcassets == self.sample_merge_with)
+        self.assertTrue(configuration.extract_path == self.sample_extract_path)
 
     def test_using_config_file(self):
         configuration = ConfigurationManager.get_configuration(xcassets_dir=self.sample_xcassets_dir,
@@ -43,54 +46,56 @@ class TestConfigurationManager(TestCase):
                                                                generated_assets_dir=self.sample_generated_assets_dir,
                                                                merge_with_xcassets=self.sample_merge_with,
                                                                force_convert=self.sample_force_convert,
+                                                               extract_path=self.sample_extract_path,
                                                                config_file_path=os.path.join(self.config_files_path,
                                                                                              os.path.join(
                                                                                                  self.temp_dir_path,
                                                                                                  self.config_files_path,
                                                                                                  "config.yml")))
 
-        self.assertTrue(configuration.xcassets_dir == "fake_xcassets_dir")
-        self.assertTrue(configuration.raw_assets == "fake_raw_assets")
-        self.assertTrue(configuration.generated_assets_dir == "fake_generated_assets")
-        self.assertTrue(configuration.merge_with_xcassets == False)
-        self.assertTrue(configuration.force_convert == True)
+        self.assertEqual(configuration.xcassets_dir, "fake_xcassets_dir")
+        self.assertEqual(configuration.raw_assets, "fake_raw_assets")
+        self.assertEqual(configuration.generated_assets_dir, "fake_generated_assets")
+        self.assertEqual(configuration.merge_with_xcassets, False)
+        self.assertEqual(configuration.force_convert, True)
 
     def test_fail_when_there_are_no_parameters_and_config_file(self):
         self.assertRaises(NoConfigurationProvidedException, ConfigurationManager.get_configuration, None, None, None,
-                          None, None, None)
+                          None, None, None, None)
 
     def test_fail_when_provided_config_file_does_not_exist(self):
         self.assertRaises(NoConfigFileFoundException, ConfigurationManager.get_configuration, None, None, None, None,
-                          None, "blah_blah_blah")
+                          None, None, "blah_blah_blah")
 
     def test_fail_when_there_is_empty_config_file(self):
         self.assertRaises(NotCompleteConfigurationInConfigFileException, ConfigurationManager.get_configuration, None,
-                          None, None, None, None,
+                          None, None, None, None, None,
                           config_file_path=os.path.join(self.config_files_path,
                                                         os.path.join(self.temp_dir_path, self.config_files_path,
                                                                      "empty.yml")))
 
     def test_fail_when_there_are_not_enough_parameters_in_config_file(self):
         self.assertRaises(NotCompleteConfigurationInConfigFileException, ConfigurationManager.get_configuration, None,
-                          None, None, None, None,
+                          None, None, None, None, None,
                           config_file_path=os.path.join(self.config_files_path,
                                                         os.path.join(self.temp_dir_path, self.config_files_path,
                                                                      "half_empty.yml")))
 
     def test_fail_when_not_all_parameters_are_provided(self):
         wrong_args_sets = (
-            (None, "b", "c", "d", "e"),
-            ("", "b", "c", "d", "e"),
-            ( "a", None, "c", "d", "e"),
-            ( "a", "", "c", "d", "e"),
-            ( "a", "b", None, "d", "e"),
-            ( "a", "b", "", "d", "e"),
-            ( "a", "b", "c", None, "e"),
-            ( "a", "b", "c", "", "e"),
-            ( "a", "b", "c", None, "e"),
-            ( "a", "b", "c", "", "e"),
-            ( "a", "b", "c", "d", ""),
-            ( "a", "b", "c", "d", None),
+            (None, "b", "c", "d", "e", "f"),
+            ("", "b", "c", "d", "e", "f"),
+            ("a", None, "c", "d", "e", "f"),
+            ("a", "", "c", "d", "e", "f"),
+            ("a", "b", None, "d", "e", "f"),
+            ("a", "b", "", "d", "e", "f"),
+            ("a", "b", "c", None, "e", "f"),
+            ("a", "b", "c", "", "e", "f"),
+            ("a", "b", "c", None, "e", "f"),
+            ("a", "b", "c", "", "e", "f"),
+            ("a", "b", "c", "d", None, ""),
+            ("a", "b", "c", "d", "e", ""),
+            ("a", "b", "c", "d", "e", None),
         )
 
         for wrong_args in wrong_args_sets:

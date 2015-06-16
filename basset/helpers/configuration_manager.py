@@ -11,6 +11,7 @@ class BassetConfiguration:
     def __init__(self):
         self.xcassets_dir = None
         self.raw_assets = None
+        self.extract_path = None
         self.generated_assets_dir = None
         self.merge_with_xcassets = True
         self.force_convert = False
@@ -19,10 +20,10 @@ class BassetConfiguration:
         return "Default xcassets: {0} \n" \
                "Assets directory: {1} \n" \
                "Generated assets directory: {2} \n" \
-               "Merge with xcassets: {3}\n" \
-               "Force convert: {4}".format(self.xcassets_dir, self.raw_assets, self.generated_assets_dir,
-                                           self.merge_with_xcassets, self.force_convert)
-
+               "Extract path: {3} \n" \
+               "Merge with xcassets: {4}\n" \
+               "Force convert: {5}".format(self.xcassets_dir, self.raw_assets, self.generated_assets_dir,
+                                           self.extract_path, self.merge_with_xcassets, self.force_convert)
 
 class ConfigurationManager:
     def __init__(self):
@@ -30,15 +31,15 @@ class ConfigurationManager:
         pass
 
     @staticmethod
-    def get_configuration(xcassets_dir, raw_assets, generated_assets_dir, merge_with_xcassets, force_convert,
+    def get_configuration(xcassets_dir, raw_assets, generated_assets_dir, merge_with_xcassets, force_convert, extract_path,
                           config_file_path):
         configuration = BassetConfiguration()
 
-        if not xcassets_dir and not raw_assets and not generated_assets_dir and not merge_with_xcassets and not force_convert and not config_file_path:
+        if not xcassets_dir and not raw_assets and not extract_path and not generated_assets_dir and not merge_with_xcassets and not force_convert and not config_file_path:
             raise NoConfigurationProvidedException()
 
         if not config_file_path and (
-                                not xcassets_dir or not raw_assets or not generated_assets_dir or not merge_with_xcassets or not force_convert ):
+                                not xcassets_dir or not raw_assets  or not extract_path or not generated_assets_dir or not merge_with_xcassets or not force_convert):
             raise NotAllConfigurationParametersPresentException()
 
         if config_file_path:
@@ -63,6 +64,7 @@ class ConfigurationManager:
             logging.info("Using configuration from command line")
             configuration.xcassets_dir = xcassets_dir
             configuration.raw_assets = raw_assets
+            configuration.extract_path = extract_path
             configuration.generated_assets_dir = generated_assets_dir
             configuration.merge_with_xcassets = merge_with_xcassets
             configuration.force_convert = force_convert

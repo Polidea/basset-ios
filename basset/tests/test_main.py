@@ -12,6 +12,7 @@ class TestBasset(TestCase):
     sample_xcassets_dir = "sample_xcassets_dir"
     sample_raw_assets_dir = "sample_raw_assets_dir"
     sample_generated_assets_dir = "sample_generated_assets_dir"
+    sample_extract_path = "sample_extract_path"
     sample_merge_with = True
     sample_force_covert = True
 
@@ -28,41 +29,65 @@ class TestBasset(TestCase):
         configuration.raw_assets = self.sample_raw_assets_dir
         configuration.generated_assets_dir = self.sample_generated_assets_dir
         configuration.merge_with_xcassets = self.sample_merge_with
+        configuration.extract_path = self.sample_extract_path
         configuration.force_convert = self.sample_force_covert
 
         merger = Merger()
         converter = Converter()
-        basset = Basset(merger=merger, converter=converter, configuration=configuration)
+        extractor = Mock()
+        basset = Basset(merger=merger, converter=converter, extractor=extractor, configuration=configuration)
 
-        self.assertTrue(basset.merger.default_xcasset_dir == self.sample_xcassets_dir)
-        self.assertTrue(basset.merger.source_assets_dir == self.sample_generated_assets_dir)
+        self.assertEqual(basset.merger.default_xcasset_dir, self.sample_xcassets_dir)
+        self.assertEqual(basset.merger.source_assets_dir, self.sample_generated_assets_dir)
 
-        self.assertTrue(basset.converter.inputDir == self.sample_raw_assets_dir)
-        self.assertTrue(basset.converter.outputDir == self.sample_generated_assets_dir)
-        self.assertTrue(basset.converter.force_convert == self.sample_force_covert)
+        self.assertEqual(basset.converter.inputDir, self.sample_raw_assets_dir)
+        self.assertEqual(basset.converter.outputDir, self.sample_generated_assets_dir)
+        self.assertEqual(basset.converter.force_convert, self.sample_force_covert)
 
-    def test_if_converter_and_merger_methods_are_called_in_order(self):
+        self.assertEqual(basset.extractor.input_dir, self.sample_extract_path)
+        self.assertEqual(basset.extractor.output_dir, self.sample_raw_assets_dir)
+
+    def test_if_converter_and_merger_methods_are_called(self):
         configuration = BassetConfiguration()
         configuration.merge_with_xcassets = True
+        configuration.extract_path = None
 
         merger = Mock()
         converter = Mock()
+        extractor = Mock()
 
-        basset = Basset(merger=merger, converter=converter, configuration=configuration)
+        basset = Basset(merger=merger, converter=converter, extractor=extractor, configuration=configuration)
         basset.launch()
 
         converter.convert.assert_called_once_with()
         merger.merge.assert_called_once_with()
+        self.assertEqual(extractor.extract.call_count, 0)
 
     def test_respect_merge_with_xcassets_flag(self):
         configuration = BassetConfiguration()
         configuration.merge_with_xcassets = False
+        configuration.extract_path = None
 
         merger = Mock()
         converter = Mock()
-        basset = Basset(merger=merger, converter=converter, configuration=configuration)
+        extractor = Mock()
+        basset = Basset(merger=merger, converter=converter, extractor=extractor, configuration=configuration)
         basset.launch()
 
         converter.convert.assert_called_once_with()
         self.assertEqual(merger.merge.call_count, 0)
+        self.assertEqual(extractor.extract.call_count, 0)
 
+    def test_cont_convert_and_merge_in_extract_mode(self):
+        configuration = BassetConfiguration()
+        configuration.extract_path = "some_path"
+
+        merger = Mock()
+        converter = Mock()
+        extractor = Mock()
+        basset = Basset(merger=merger, converter=converter, extractor=extractor, configuration=configuration)
+        basset.launch()
+
+        self.assertEqual(converter.convert.call_count, 0)
+        self.assertEqual(merger.merge.call_count, 0)
+        extractor.extract.assert_called_once_with()

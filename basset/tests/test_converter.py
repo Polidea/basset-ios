@@ -1,6 +1,6 @@
-import os
 import shutil
 import tempfile
+
 from unittest import TestCase
 
 from wand.image import Image
@@ -112,7 +112,6 @@ class TestConverter(TestCase):
         except AssetsDirNotFoundException as e:
             self.assertEqual(e.asset_dir_candidate, None)
 
-
     def test_dont_reconvert_old_files_test(self):
         converter = Converter()
         os.chdir(os.path.join(self.converter_tests_resource_path, "dont_reconvert_old_files_test"))
@@ -133,7 +132,6 @@ class TestConverter(TestCase):
 
         self.assertEqual(sha1_of_generated_files[0], sha1_of_generated_files[2])
         self.assertNotEqual(sha1_of_generated_files[1], sha1_of_generated_files[3])
-
 
     def test_respect_force_flag(self):
         converter = Converter()
@@ -196,11 +194,32 @@ class TestConverter(TestCase):
         self.assert_valid_png_file(
             os.path.join(self.converter_output_tests_resource_path, "subfolder", filename + ".png"),
             (100, 100))
-        self.assertFalse(os.path.isfile(os.path.join(self.converter_output_tests_resource_path, "subfolder", filename + "@2x.png")))
-        self.assertFalse(os.path.isfile(os.path.join(self.converter_output_tests_resource_path, "subfolder", filename + "@3x.png")))
+        self.assertFalse(
+            os.path.isfile(os.path.join(self.converter_output_tests_resource_path, "subfolder", filename + "@2x.png")))
+        self.assertFalse(
+            os.path.isfile(os.path.join(self.converter_output_tests_resource_path, "subfolder", filename + "@3x.png")))
 
     def test_dont_resize_and_rename_f_suffixes_2x(self):
         self.check_if_file_not_resized_and_additional_suffix_not_added("a@2x")
 
     def test_dont_resize_and_rename_f_suffixes_3x(self):
         self.check_if_file_not_resized_and_additional_suffix_not_added("a@3x")
+
+    def test_should_raise_exception_when_assets_dir_contains_xcassets_dir(self):
+        os.mkdir("test.xcassets")
+        converter = Converter()
+        converter.inputDir = "."
+        converter.outputDir = self.converter_output_tests_resource_path
+        pass
+
+    def test_should_raise_exception_when_imageset_dir_is_xcassets_dir(self):
+        converter = Converter()
+        converter.inputDir = os.path.join(self.converter_tests_resource_path, "convert_xcassets_exception_test")
+        converter.outputDir = self.converter_output_tests_resource_path
+
+        try:
+            converter.convert()
+            self.fail("This should fail")
+        except AssetsDirContainsImagesetDirectoryException as e:
+            self.assertEqual(e.imageset_directory_path, os.path.join(converter.inputDir, "test.xcassets","test.imageset"))
+            self.assertEqual(e.assets_dir, converter.inputDir)
