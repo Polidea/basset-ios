@@ -56,8 +56,8 @@ class TestConverter(TestCase):
 
     def test_convert(self):
         converter = Converter()
-        converter.inputDir = os.path.join(self.converter_tests_resource_path, "convert_test")
-        converter.outputDir = self.converter_output_tests_resource_path
+        converter.input_dir = os.path.join(self.converter_tests_resource_path, "convert_test")
+        converter.output_dir = self.converter_output_tests_resource_path
         converter.convert()
 
         for i in range(1, 3):
@@ -91,8 +91,8 @@ class TestConverter(TestCase):
     def test_should_raise_exception_with_assets_dir_not_present(self):
         converter = Converter()
         os.chdir(os.path.join(self.converter_tests_resource_path, "suggest_asset_diretory_test"))
-        converter.inputDir = "FaceAssetsDir"
-        converter.outputDir = self.converter_output_tests_resource_path
+        converter.input_dir = "FaceAssetsDir"
+        converter.output_dir = self.converter_output_tests_resource_path
 
         try:
             converter.convert()
@@ -103,8 +103,8 @@ class TestConverter(TestCase):
     def test_should_raise_exception_with_empty_parameter_if_no_vector_files_found(self):
         converter = Converter()
         os.chdir(os.path.join(self.converter_tests_resource_path, "suggest_asset_diretory_test", "Images.xcassets"))
-        converter.inputDir = "FaceAssetsDir"
-        converter.outputDir = self.converter_output_tests_resource_path
+        converter.input_dir = "FaceAssetsDir"
+        converter.output_dir = self.converter_output_tests_resource_path
 
         try:
             converter.convert()
@@ -115,20 +115,20 @@ class TestConverter(TestCase):
     def test_dont_reconvert_old_files_test(self):
         converter = Converter()
         os.chdir(os.path.join(self.converter_tests_resource_path, "dont_reconvert_old_files_test"))
-        converter.inputDir = "Assets"
-        converter.outputDir = self.converter_output_tests_resource_path
+        converter.input_dir = "Assets"
+        converter.output_dir = self.converter_output_tests_resource_path
 
         converter.convert()
 
         sha1_of_generated_files = []
-        sha1_of_generated_files.append(converter.sha1_of_file(os.path.join(converter.outputDir, "test-01.png")))
-        sha1_of_generated_files.append(converter.sha1_of_file(os.path.join(converter.outputDir, "test-02.png")))
+        sha1_of_generated_files.append(converter.sha1_of_file(os.path.join(converter.output_dir, "test-01.png")))
+        sha1_of_generated_files.append(converter.sha1_of_file(os.path.join(converter.output_dir, "test-02.png")))
 
-        shutil.copy2(os.path.join(converter.inputDir, "test-01.eps"), os.path.join(converter.inputDir, "test-02.eps"))
+        shutil.copy2(os.path.join(converter.input_dir, "test-01.eps"), os.path.join(converter.input_dir, "test-02.eps"))
         converter.convert()
 
-        sha1_of_generated_files.append(converter.sha1_of_file(os.path.join(converter.outputDir, "test-01.png")))
-        sha1_of_generated_files.append(converter.sha1_of_file(os.path.join(converter.outputDir, "test-02.png")))
+        sha1_of_generated_files.append(converter.sha1_of_file(os.path.join(converter.output_dir, "test-01.png")))
+        sha1_of_generated_files.append(converter.sha1_of_file(os.path.join(converter.output_dir, "test-02.png")))
 
         self.assertEqual(sha1_of_generated_files[0], sha1_of_generated_files[2])
         self.assertNotEqual(sha1_of_generated_files[1], sha1_of_generated_files[3])
@@ -136,36 +136,36 @@ class TestConverter(TestCase):
     def test_respect_force_flag(self):
         converter = Converter()
         os.chdir(os.path.join(self.converter_tests_resource_path, "dont_reconvert_old_files_test"))
-        converter.inputDir = "Assets"
-        converter.outputDir = self.converter_output_tests_resource_path
+        converter.input_dir = "Assets"
+        converter.output_dir = self.converter_output_tests_resource_path
         converter.force_convert = True
 
         converter.convert()
 
         sha1_of_generated_files = []
-        sha1_of_generated_files.append(converter.sha1_of_file(os.path.join(converter.outputDir, "test-01.png")))
-        sha1_of_generated_files.append(converter.sha1_of_file(os.path.join(converter.outputDir, "test-02.png")))
+        sha1_of_generated_files.append(converter.sha1_of_file(os.path.join(converter.output_dir, "test-01.png")))
+        sha1_of_generated_files.append(converter.sha1_of_file(os.path.join(converter.output_dir, "test-02.png")))
 
         converter.convert()
 
-        sha1_of_generated_files.append(converter.sha1_of_file(os.path.join(converter.outputDir, "test-01.png")))
-        sha1_of_generated_files.append(converter.sha1_of_file(os.path.join(converter.outputDir, "test-02.png")))
+        sha1_of_generated_files.append(converter.sha1_of_file(os.path.join(converter.output_dir, "test-01.png")))
+        sha1_of_generated_files.append(converter.sha1_of_file(os.path.join(converter.output_dir, "test-02.png")))
 
         self.assertNotEqual(sha1_of_generated_files[0], sha1_of_generated_files[2])
         self.assertNotEqual(sha1_of_generated_files[1], sha1_of_generated_files[3])
 
     def test_escape_filenames(self):
         converter = Converter()
-        converter.inputDir = os.path.join(self.converter_tests_resource_path, "convert_test")
-        converter.outputDir = self.converter_output_tests_resource_path
+        converter.input_dir = os.path.join(self.converter_tests_resource_path, "convert_test")
+        converter.output_dir = self.converter_output_tests_resource_path
 
         fancy_filename = "& :()[]{}|"
-        shutil.rmtree(os.path.join(converter.inputDir, "subfolder", "subsubfolder"))
-        os.remove(os.path.join(converter.inputDir, "test-01.eps"))
-        os.remove(os.path.join(converter.inputDir, "test-02.eps"))
-        os.remove(os.path.join(converter.inputDir, "test-03.eps"))
-        os.rename(os.path.join(converter.inputDir, "subfolder", "test-04.eps"),
-                  os.path.join(converter.inputDir, "subfolder", fancy_filename + ".eps"))
+        shutil.rmtree(os.path.join(converter.input_dir, "subfolder", "subsubfolder"))
+        os.remove(os.path.join(converter.input_dir, "test-01.eps"))
+        os.remove(os.path.join(converter.input_dir, "test-02.eps"))
+        os.remove(os.path.join(converter.input_dir, "test-03.eps"))
+        os.rename(os.path.join(converter.input_dir, "subfolder", "test-04.eps"),
+                  os.path.join(converter.input_dir, "subfolder", fancy_filename + ".eps"))
         converter.convert()
 
         self.assert_valid_png_file(
@@ -180,15 +180,15 @@ class TestConverter(TestCase):
 
     def check_if_file_not_resized_and_additional_suffix_not_added(self, filename):
         converter = Converter()
-        converter.inputDir = os.path.join(self.converter_tests_resource_path, "convert_test")
-        converter.outputDir = self.converter_output_tests_resource_path
+        converter.input_dir = os.path.join(self.converter_tests_resource_path, "convert_test")
+        converter.output_dir = self.converter_output_tests_resource_path
 
-        shutil.rmtree(os.path.join(converter.inputDir, "subfolder", "subsubfolder"))
-        os.remove(os.path.join(converter.inputDir, "test-01.eps"))
-        os.remove(os.path.join(converter.inputDir, "test-02.eps"))
-        os.remove(os.path.join(converter.inputDir, "test-03.eps"))
-        os.rename(os.path.join(converter.inputDir, "subfolder", "test-04.eps"),
-                  os.path.join(converter.inputDir, "subfolder", filename + ".png"))
+        shutil.rmtree(os.path.join(converter.input_dir, "subfolder", "subsubfolder"))
+        os.remove(os.path.join(converter.input_dir, "test-01.eps"))
+        os.remove(os.path.join(converter.input_dir, "test-02.eps"))
+        os.remove(os.path.join(converter.input_dir, "test-03.eps"))
+        os.rename(os.path.join(converter.input_dir, "subfolder", "test-04.eps"),
+                  os.path.join(converter.input_dir, "subfolder", filename + ".png"))
         converter.convert()
 
         self.assert_valid_png_file(
@@ -208,18 +208,18 @@ class TestConverter(TestCase):
     def test_should_raise_exception_when_assets_dir_contains_xcassets_dir(self):
         os.mkdir("test.xcassets")
         converter = Converter()
-        converter.inputDir = "."
-        converter.outputDir = self.converter_output_tests_resource_path
+        converter.input_dir = "."
+        converter.output_dir = self.converter_output_tests_resource_path
         pass
 
     def test_should_raise_exception_when_imageset_dir_is_xcassets_dir(self):
         converter = Converter()
-        converter.inputDir = os.path.join(self.converter_tests_resource_path, "convert_xcassets_exception_test")
-        converter.outputDir = self.converter_output_tests_resource_path
+        converter.input_dir = os.path.join(self.converter_tests_resource_path, "convert_xcassets_exception_test")
+        converter.output_dir = self.converter_output_tests_resource_path
 
         try:
             converter.convert()
             self.fail("This should fail")
         except AssetsDirContainsImagesetDirectoryException as e:
-            self.assertEqual(e.imageset_directory_path, os.path.join(converter.inputDir, "test.xcassets","test.imageset"))
-            self.assertEqual(e.assets_dir, converter.inputDir)
+            self.assertEqual(e.imageset_directory_path, os.path.join(converter.input_dir, "test.xcassets","test.imageset"))
+            self.assertEqual(e.assets_dir, converter.input_dir)

@@ -13,9 +13,13 @@ from basset.exceptions import *
 class Converter:
     def __init__(self):
         coloredlogs.install()
-        self.inputDir = None
-        self.outputDir = None
+        self.input_dir = None
+        self.output_dir = None
         self.force_convert = False
+
+    @staticmethod
+    def allowed_image_types():
+        return ["eps", "pdf", "svg", "psd", "png", "jpg", "jpeg", "gif"]
 
     @staticmethod
     def sha1_of_file(file_path):
@@ -54,19 +58,19 @@ class Converter:
         os.system(convert_string)
 
     def convert(self):
-        allowed_image_types = ["eps", "pdf", "svg", "psd", "png", "jpg", "jpeg", "gif"]
-        logging.info("Converting vector files from " + self.inputDir + " to " + self.outputDir)
+
+        logging.info("Converting vector files from " + self.input_dir + " to " + self.output_dir)
 
         directories_with_vector_files = {}
-        if not os.path.isdir(self.inputDir):
+        if not os.path.isdir(self.input_dir):
             for path, subdirectories, files in os.walk(os.getcwd()):
                 path = os.path.relpath(path, os.getcwd())
                 for filename in files:
 
-                    if "." in filename:
+                    if "." in filename and filename[0] is not ".":
                         extension = filename.split(".")[1]
 
-                        if extension.lower() in allowed_image_types:
+                        if extension.lower() in Converter.allowed_image_types():
                             top_dir_in_path = path.split(os.sep)[0]
                             if top_dir_in_path in directories_with_vector_files:
                                 directories_with_vector_files[top_dir_in_path] += 1
@@ -85,17 +89,17 @@ class Converter:
 
         converted_files_count = 0
 
-        for original_base_path, subdirectories, files in os.walk(self.inputDir):
+        for original_base_path, subdirectories, files in os.walk(self.input_dir):
             if original_base_path.endswith(".imageset"):
-                raise AssetsDirContainsImagesetDirectoryException(original_base_path, self.inputDir)
+                raise AssetsDirContainsImagesetDirectoryException(original_base_path, self.input_dir)
 
             for filename in files:
-                if "." in filename:
+                if "." in filename and filename[0] is not ".":
                     basename = filename.split(".")[0]
                     extension = filename.split(".")[1]
 
-                    if extension.lower() in allowed_image_types:
-                        new_base_path = original_base_path.replace(self.inputDir, self.outputDir)
+                    if extension.lower() in Converter.allowed_image_types():
+                        new_base_path = original_base_path.replace(self.input_dir, self.output_dir)
                         if not os.path.exists(new_base_path):
                             os.makedirs(new_base_path)
                         original_full_path = os.path.join(original_base_path, filename)
@@ -136,9 +140,9 @@ def main(args_to_parse):
     parsed_args = parser.parse_args(args_to_parse)
 
     converter = Converter()
-    converter.inputDir = parsed_args.input_dir
-    converter.outputDir = parsed_args.output_dir
-    converter.outputDir = parsed_args.force_convert
+    converter.input_dir = parsed_args.input_dir
+    converter.output_dir = parsed_args.output_dir
+    converter.output_dir = parsed_args.force_convert
     converter.convert()
 
 
