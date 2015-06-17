@@ -1,10 +1,12 @@
 import argparse
+import json
 import logging
-import sys
 import subprocess
+import sys
+import hashlib
 
-import coloredlogs
 from wand.image import Image
+import coloredlogs
 
 from basset.exceptions import *
 
@@ -12,9 +14,10 @@ from basset.exceptions import *
 class Converter:
     def __init__(self):
         coloredlogs.install()
-        self.input_dir = None
-        self.output_dir = None
+        self.input_dir = ""
+        self.output_dir = ""
         self.force_convert = False
+        self.converted_files_hashes = {}
 
     @staticmethod
     def allowed_image_types():
@@ -22,8 +25,6 @@ class Converter:
 
     @staticmethod
     def sha1_of_file(file_path):
-        import hashlib
-
         sha = hashlib.sha1()
         with open(file_path, 'rb') as f:
             for line in f:
@@ -32,13 +33,8 @@ class Converter:
 
     def convert_single_file(self, source_file, destination_file, target_resolution):
         sha1_of_original_file = self.sha1_of_file(source_file)
-        if self.force_convert is False and os.path.isfile(destination_file):
-            comment = subprocess.check_output("identify -verbose \"{0}\" | grep comment:".format(destination_file),
-                                              shell=True).decode("utf-8")
-            previous_sha1 = comment.replace("comment:", "").strip(" \t\n\r")
-            will_be_reconverting_the_same_file = previous_sha1 == sha1_of_original_file
-            if will_be_reconverting_the_same_file:
-                raise AssetAlreadyGeneratedException()
+
+        self.converted_files_hashes[destination_file] = sha1_of_original_file
         convert_string = "convert \"{0}\" " \
                          "-resize {1}x{2} " \
                          "-density {3}x{4} " \
@@ -52,8 +48,34 @@ class Converter:
 
         os.system(convert_string)
 
+    def check_if_file_needs_reconverting(self, source_file, destination_file):
+        sha1_of_original_file = self.sha1_of_file(source_file)
+
+        destination_file_missing = not os.path.isfile(destination_file)
+        destination_file_was_generated_from_the_different_file = destination_file in self.converted_files_hashes and \
+                                                                 self.converted_files_hashes[
+                                                                     destination_file] != sha1_of_original_file
+
+        return self.force_convert or destination_file_missing or destination_file_was_generated_from_the_different_file
+
+    @staticmethod
+    def size_of_image(path):
+        raw = subprocess.check_output("identify -verbose \"{0}\" | grep Resolution:".format(path),
+                                      shell=True).decode("utf-8")
+        resolution = raw.replace("Resolution::", "").strip(" \t\n\r")
+
+        resolution_parts = resolution.split("x")
+
+        return resolution_parts[0], resolution_parts[1]
+
     def convert(self):
         logging.info("Converting vector files from {0} to {1}".format(self.input_dir, self.output_dir))
+
+        temp_file = os.path.join(self.output_dir, ".basset_temp")
+        if os.path.isfile(temp_file):
+            with open(temp_file, "r") as data_file:
+                self.converted_files_hashes = json.load(data_file)
+
         self.check_if_input_dir_contains_vector_assets()
         self.check_if_input_dir_contains_xcassets()
 
@@ -73,27 +95,32 @@ class Converter:
 
                         converted_files_count += 1
 
-                        with Image(filename=original_full_path) as img:
-                            original_size = img.size
+                        destination_paths = [os.path.join(new_base_path, basename + ".png"),
+                                             os.path.join(new_base_path, basename + "@2x.png"),
+                                             os.path.join(new_base_path, basename + "@3x.png")]
 
-                        image_size_1x = (original_size[0], original_size[0])
-                        image_size_2x = (original_size[0] * 2, original_size[0] * 2)
-                        image_size_3x = (original_size[0] * 3, original_size[0] * 3)
+                        files_to_reconvert_list = []
+                        for single_destination_path in destination_paths:
+                            files_to_reconvert_list.append(self.check_if_file_needs_reconverting(original_full_path,
+                                                                                                 single_destination_path))
 
-                        try:
-                            self.convert_single_file(original_full_path, os.path.join(new_base_path, basename + ".png"),
-                                                     image_size_1x)
+                        if True in files_to_reconvert_list:
+                            with Image(filename=original_full_path) as img:
+                                original_size = img.size
+
+                            image_size_1x = (original_size[0], original_size[0])
+                            image_size_2x = (original_size[0] * 2, original_size[0] * 2)
+                            image_size_3x = (original_size[0] * 3, original_size[0] * 3)
+
+                            self.convert_single_file(original_full_path, destination_paths[0], image_size_1x)
                             if not basename.endswith(("@2x", "@3x")):
-                                self.convert_single_file(original_full_path,
-                                                         os.path.join(new_base_path, basename + "@2x.png"),
-                                                         image_size_2x)
-                                self.convert_single_file(original_full_path,
-                                                         os.path.join(new_base_path, basename + "@3x.png"),
-                                                         image_size_3x)
+                                self.convert_single_file(original_full_path, destination_paths[1], image_size_2x)
+                                self.convert_single_file(original_full_path, destination_paths[2], image_size_3x)
 
                             logging.info("Converted {0}".format(original_full_path))
-                        except AssetAlreadyGeneratedException:
-                            logging.info("Skipping (already generated) {0}".format(original_full_path))
+
+        with open(temp_file, "w+") as data_file:
+            json.dump(self.converted_files_hashes, data_file, indent=1)
 
         logging.info("Images conversion finished. Processed " + str(converted_files_count) + " images")
 
