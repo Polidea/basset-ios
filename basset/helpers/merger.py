@@ -10,8 +10,8 @@ from basset.exceptions import *
 
 class Merger:
     def __init__(self):
-        self.source_assets_dir = None
-        self.default_xcasset_dir = None
+        self.source_assets_dir = ""
+        self.default_xcasset_dir = ""
         coloredlogs.install()
 
     def get_selected_xcassets_dir(self):
@@ -38,6 +38,9 @@ class Merger:
         return selected_xcassets
 
     def merge(self):
+        self.source_assets_dir = self.source_assets_dir.rstrip('\\/')
+        self.default_xcasset_dir = self.default_xcasset_dir.rstrip('\\/')
+
         logging.info("Merging assets from {0} using {1} as default xcassets".format(self.source_assets_dir,
                                                                                     self.default_xcasset_dir))
 

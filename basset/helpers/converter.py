@@ -21,7 +21,7 @@ class Converter:
 
     @staticmethod
     def allowed_image_types():
-        return ["eps", "pdf", "svg", "psd", "png", "jpg", "jpeg", "gif"]
+        return ["eps", "pdf", "svg", "psd"]
 
     @staticmethod
     def sha1_of_file(file_path):
@@ -38,13 +38,12 @@ class Converter:
         convert_string = "convert \"{0}\" " \
                          "-resize {1}x{2} " \
                          "-density {3}x{4} " \
-                         "-set comment {5} " \
-                         "\"{6}\"".format(source_file,
+                         "\"{5}\"".format(source_file,
                                           target_resolution[0],
                                           target_resolution[1],
                                           target_resolution[0],
                                           target_resolution[1],
-                                          sha1_of_original_file, destination_file)
+                                          destination_file)
 
         os.system(convert_string)
 
@@ -69,6 +68,9 @@ class Converter:
         return resolution_parts[0], resolution_parts[1]
 
     def convert(self):
+        self.input_dir = self.input_dir.rstrip('\\/')
+        self.output_dir = self.output_dir.rstrip('\\/')
+
         logging.info("Converting vector files from {0} to {1}".format(self.input_dir, self.output_dir))
 
         temp_file = os.path.join(self.output_dir, ".basset_temp")
@@ -85,39 +87,36 @@ class Converter:
             for filename in files:
                 if "." in filename and filename[0] is not ".":
                     basename = filename.split(".")[0]
-                    extension = filename.split(".")[1]
+                    extension = filename.split(".")[1].lower()
 
-                    if extension.lower() in Converter.allowed_image_types():
+                    if extension in Converter.allowed_image_types():
                         new_base_path = original_base_path.replace(self.input_dir, self.output_dir)
                         if not os.path.exists(new_base_path):
                             os.makedirs(new_base_path)
                         original_full_path = os.path.join(original_base_path, filename)
 
-                        converted_files_count += 1
+                        destination_templates = [(1, ".png")]
+                        if extension is not "png":
+                            destination_templates.append((2, "@2x.png"))
+                            destination_templates.append((3, "@3x.png"))
 
-                        destination_paths = [os.path.join(new_base_path, basename + ".png"),
-                                             os.path.join(new_base_path, basename + "@2x.png"),
-                                             os.path.join(new_base_path, basename + "@3x.png")]
+                        selected_destination_templates = []
+                        for template in destination_templates:
+                            destination_path = os.path.join(new_base_path, basename + template[1])
+                            if self.check_if_file_needs_reconverting(original_full_path, destination_path):
+                                selected_destination_templates.append(template)
 
-                        files_to_reconvert_list = []
-                        for single_destination_path in destination_paths:
-                            files_to_reconvert_list.append(self.check_if_file_needs_reconverting(original_full_path,
-                                                                                                 single_destination_path))
-
-                        if True in files_to_reconvert_list:
+                        if len(selected_destination_templates) > 0:
                             with Image(filename=original_full_path) as img:
                                 original_size = img.size
 
-                            image_size_1x = (original_size[0], original_size[0])
-                            image_size_2x = (original_size[0] * 2, original_size[0] * 2)
-                            image_size_3x = (original_size[0] * 3, original_size[0] * 3)
+                            for template in selected_destination_templates:
+                                converted_files_count += 1
+                                new_image_size = (original_size[0] * template[0], original_size[1] * template[0])
+                                destination_path = os.path.join(new_base_path, basename + template[1])
 
-                            self.convert_single_file(original_full_path, destination_paths[0], image_size_1x)
-                            if not basename.endswith(("@2x", "@3x")):
-                                self.convert_single_file(original_full_path, destination_paths[1], image_size_2x)
-                                self.convert_single_file(original_full_path, destination_paths[2], image_size_3x)
-
-                            logging.info("Converted {0}".format(original_full_path))
+                                self.convert_single_file(original_full_path, destination_path, new_image_size)
+                                logging.info("Converted {0} to {1}".format(original_full_path, destination_path))
 
         with open(temp_file, "w+") as data_file:
             json.dump(self.converted_files_hashes, data_file, indent=1)

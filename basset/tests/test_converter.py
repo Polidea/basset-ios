@@ -178,33 +178,6 @@ class TestConverter(TestCase):
             os.path.join(self.converter_output_tests_resource_path, "subfolder", fancy_filename + "@3x.png"),
             (300, 300))
 
-    def check_if_file_not_resized_and_additional_suffix_not_added(self, filename):
-        converter = Converter()
-        converter.input_dir = os.path.join(self.converter_tests_resource_path, "convert_test")
-        converter.output_dir = self.converter_output_tests_resource_path
-
-        shutil.rmtree(os.path.join(converter.input_dir, "subfolder", "subsubfolder"))
-        os.remove(os.path.join(converter.input_dir, "test-01.eps"))
-        os.remove(os.path.join(converter.input_dir, "test-02.eps"))
-        os.remove(os.path.join(converter.input_dir, "test-03.eps"))
-        os.rename(os.path.join(converter.input_dir, "subfolder", "test-04.eps"),
-                  os.path.join(converter.input_dir, "subfolder", filename + ".png"))
-        converter.convert()
-
-        self.assert_valid_png_file(
-            os.path.join(self.converter_output_tests_resource_path, "subfolder", filename + ".png"),
-            (100, 100))
-        self.assertFalse(
-            os.path.isfile(os.path.join(self.converter_output_tests_resource_path, "subfolder", filename + "@2x.png")))
-        self.assertFalse(
-            os.path.isfile(os.path.join(self.converter_output_tests_resource_path, "subfolder", filename + "@3x.png")))
-
-    def test_dont_resize_and_rename_f_suffixes_2x(self):
-        self.check_if_file_not_resized_and_additional_suffix_not_added("a@2x")
-
-    def test_dont_resize_and_rename_f_suffixes_3x(self):
-        self.check_if_file_not_resized_and_additional_suffix_not_added("a@3x")
-
     def test_should_raise_exception_when_assets_dir_contains_xcassets_dir(self):
         os.mkdir("test.xcassets")
         converter = Converter()

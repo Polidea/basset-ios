@@ -38,10 +38,12 @@ class TestExtractor(TestCase):
     def test_should_raise_exception_when_input_dir_is_not_xcassets(self):
         extractor = Extractor()
         extractor.input_dir = os.path.join("non_xcassets_directory_set_test", "assets")
+        extractor.output_dir = ""
         assert_raises(ExtractDirIsNotXcassetsDirException, extractor.extract)
 
         extractor = Extractor()
         extractor.input_dir = os.path.join("non_xcassets_directory_set_test", "assets.xcassets/")
+        extractor.output_dir = ""
         try:
             extractor.extract()
         except Exception:

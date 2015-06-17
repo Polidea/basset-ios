@@ -1,6 +1,7 @@
 import argparse
 import sys
 import shutil
+import logging
 
 import coloredlogs
 
@@ -16,10 +17,13 @@ class Extractor:
 
     def extract(self):
         self.input_dir = self.input_dir.rstrip('\\/')
+        self.output_dir = self.output_dir.rstrip('\\/')
+        logging.info("Extracting vector files from {0} to {1}".format(self.input_dir, self.output_dir))
 
         if not self.input_dir.endswith(".xcassets"):
             raise ExtractDirIsNotXcassetsDirException()
 
+        extracted_files_count = 0
         for path, subdirectories, files in os.walk(self.input_dir):
             processed_assets = False
             for filename in files:
@@ -32,11 +36,15 @@ class Extractor:
                         if not os.path.isdir(output_dir_with_subdirectories):
                             os.makedirs(output_dir_with_subdirectories)
 
-                        shutil.copy2(os.path.join(path, filename),
-                                     os.path.join(output_dir_with_subdirectories, filename))
+                        extracted_files_count += 1
+                        source_path = os.path.join(path, filename)
+                        destination_path = os.path.join(output_dir_with_subdirectories, filename)
+                        shutil.copy2(source_path, destination_path)
+                        logging.info("Extracting {0} to {1}".format(source_path, destination_path))
 
             if processed_assets:
                 shutil.rmtree(path)
+        logging.info("Extracted {0} files".format(extracted_files_count))
 
 
 def main(args_to_parse):
