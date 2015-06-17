@@ -31,16 +31,17 @@ class Converter:
                 sha.update(line)
             return sha.hexdigest()
 
-    def convert_single_file(self, source_file, destination_file, target_resolution):
+    def convert_single_file(self, source_file, destination_file, target_resolution, scale_factor):
         sha1_of_original_file = self.sha1_of_file(source_file)
 
         self.converted_files_hashes[destination_file] = sha1_of_original_file
-        convert_string = "convert \"{0}\" " \
-                         "-resize {1}x{2} " \
-                         "-density {3}x{4} " \
-                         "\"{5}\"".format(source_file,
-                                          target_resolution[0],
-                                          target_resolution[1],
+
+        convert_string = "convert " \
+                         "-density {0}00% " \
+                         "\"{1}\" " \
+                         "-resize {2}x{3} " \
+                         "\"{4}\"".format(scale_factor,
+                                          source_file,
                                           target_resolution[0],
                                           target_resolution[1],
                                           destination_file)
@@ -115,7 +116,8 @@ class Converter:
                                 new_image_size = (original_size[0] * template[0], original_size[1] * template[0])
                                 destination_path = os.path.join(new_base_path, basename + template[1])
 
-                                self.convert_single_file(original_full_path, destination_path, new_image_size)
+                                self.convert_single_file(original_full_path, destination_path, new_image_size,
+                                                         template[0])
                                 logging.info("Converted {0} to {1}".format(original_full_path, destination_path))
 
         with open(temp_file, "w+") as data_file:
