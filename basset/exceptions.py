@@ -41,19 +41,15 @@ class AssetsDirContainsImagesetDirectoryException(BassetException):
         self.assets_dir = assets_dir
 
     def get_message(self):
-        absolute_path = os.path.abspath(self.imageset_directory_path)
-        xcassets_directory_suffix = "xcassets"
-        xcassets_dir_path = absolute_path[
-                            :(absolute_path.find(xcassets_directory_suffix) + xcassets_directory_suffix.__len__())]
-        return "Imageset directory found: '{0}'. You cannot have existing xcassets inside vector assets directory. You can extract them with:\n" \
-               "basset_ios -e {1} -r {2}" \
-               "".format(self.imageset_directory_path, xcassets_dir_path, self.assets_dir)
+        return "Found .xcassets directory with an asset inside: '{0}'. \n" \
+               "You cannot have existing xcassets inside vector assets directory. You can extract them with:\n" \
+               "basset_ios -e <path_to_xcassets> -r <path_to_vector_assets_dir>" \
+               "".format(self.imageset_directory_path)
 
 
 class NoXCAssetsFoundException(BassetException):
     def get_message(self):
         return "No xcassets found"
-
 
 class AssetsDirNotFoundException(BassetException):
     def __init__(self, asset_dir_candidate):
@@ -65,7 +61,7 @@ class AssetsDirNotFoundException(BassetException):
                    "basset_ios -r <assets_directory_path>"
         else:
             return "I haven't found vector assets directory you've provided, but it looks like most of them are in \"{0}\" directory. You can use this directory by running basset with command: \n" \
-                   "basset_ios -r {1} \nor create config file.".format(self.asset_dir_candidate,
+                   "basset_ios -r \"{1}\" \nor create config file.".format(self.asset_dir_candidate,
                                                                        self.asset_dir_candidate)
 
 
@@ -74,4 +70,6 @@ class NoDefaultXCAssetFoundException(BassetException):
         self.assets_count = assets_count
 
     def get_message(self):
-        return "Found {0} xcassets, but none of them is default one!".format(str(self.assets_count))
+        return "Found {0} xcassets, but none of them is default one!\n" \
+               "Please select xcassets with this command:\n" \
+               "basset_ios -x <xcassets_dir_path>".format(str(self.assets_count))

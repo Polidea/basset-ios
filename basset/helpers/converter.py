@@ -1,5 +1,4 @@
 import argparse
-import os
 import logging
 import sys
 import subprocess
@@ -31,67 +30,35 @@ class Converter:
                 sha.update(line)
             return sha.hexdigest()
 
-
     def convert_single_file(self, source_file, destination_file, target_resolution):
         sha1_of_original_file = self.sha1_of_file(source_file)
-
         if self.force_convert is False and os.path.isfile(destination_file):
             comment = subprocess.check_output("identify -verbose \"{0}\" | grep comment:".format(destination_file),
                                               shell=True).decode("utf-8")
             previous_sha1 = comment.replace("comment:", "").strip(" \t\n\r")
-
-            if previous_sha1 == sha1_of_original_file:
+            will_be_reconverting_the_same_file = previous_sha1 == sha1_of_original_file
+            if will_be_reconverting_the_same_file:
                 raise AssetAlreadyGeneratedException()
-
-        convert_string = "convert \"{0}\" -resize {1}x{2} -density {3}x{4} -set comment {5} \"{6}\"".format(source_file,
-                                                                                                    target_resolution[
-                                                                                                        0],
-                                                                                                    target_resolution[
-                                                                                                        1],
-                                                                                                    target_resolution[
-                                                                                                        0],
-                                                                                                    target_resolution[
-                                                                                                        1],
-                                                                                                    sha1_of_original_file,
-                                                                                                    destination_file)
+        convert_string = "convert \"{0}\" " \
+                         "-resize {1}x{2} " \
+                         "-density {3}x{4} " \
+                         "-set comment {5} " \
+                         "\"{6}\"".format(source_file,
+                                          target_resolution[0],
+                                          target_resolution[1],
+                                          target_resolution[0],
+                                          target_resolution[1],
+                                          sha1_of_original_file, destination_file)
 
         os.system(convert_string)
 
     def convert(self):
-
-        logging.info("Converting vector files from " + self.input_dir + " to " + self.output_dir)
-
-        directories_with_vector_files = {}
-        if not os.path.isdir(self.input_dir):
-            for path, subdirectories, files in os.walk(os.getcwd()):
-                path = os.path.relpath(path, os.getcwd())
-                for filename in files:
-
-                    if "." in filename and filename[0] is not ".":
-                        extension = filename.split(".")[1]
-
-                        if extension.lower() in Converter.allowed_image_types():
-                            top_dir_in_path = path.split(os.sep)[0]
-                            if top_dir_in_path in directories_with_vector_files:
-                                directories_with_vector_files[top_dir_in_path] += 1
-                            else:
-                                directories_with_vector_files[top_dir_in_path] = 1
-
-            max_vector_files_count = -1
-            directory_with_max_vector_files = None
-            for path in directories_with_vector_files.keys():
-                if directories_with_vector_files is not None:
-                    if directories_with_vector_files[path] > max_vector_files_count:
-                        max_vector_files_count = directories_with_vector_files[path]
-                        directory_with_max_vector_files = path
-
-            raise AssetsDirNotFoundException(directory_with_max_vector_files)
+        logging.info("Converting vector files from {0} to {1}".format(self.input_dir, self.output_dir))
+        self.check_if_input_dir_contains_vector_assets()
+        self.check_if_input_dir_contains_xcassets()
 
         converted_files_count = 0
-
         for original_base_path, subdirectories, files in os.walk(self.input_dir):
-            if original_base_path.endswith(".imageset"):
-                raise AssetsDirContainsImagesetDirectoryException(original_base_path, self.input_dir)
 
             for filename in files:
                 if "." in filename and filename[0] is not ".":
@@ -130,11 +97,44 @@ class Converter:
 
         logging.info("Images conversion finished. Processed " + str(converted_files_count) + " images")
 
+    def check_if_input_dir_contains_xcassets(self):
+        for original_base_path, subdirectories, files in os.walk(self.input_dir):
+            if original_base_path.endswith(".imageset"):
+                raise AssetsDirContainsImagesetDirectoryException(original_base_path, self.input_dir)
+
+    def check_if_input_dir_contains_vector_assets(self):
+        directories_with_vector_files = {}
+        if not os.path.isdir(self.input_dir):
+            for path, subdirectories, files in os.walk(os.getcwd()):
+                path = os.path.relpath(path, os.getcwd())
+                for filename in files:
+                    if "." in filename and filename[0] is not ".":
+                        extension = filename.split(".")[1]
+
+                        if extension.lower() in Converter.allowed_image_types():
+                            top_dir_in_path = path.split(os.sep)[0]
+                            if top_dir_in_path in directories_with_vector_files:
+                                directories_with_vector_files[top_dir_in_path] += 1
+                            else:
+                                directories_with_vector_files[top_dir_in_path] = 1
+
+            if directories_with_vector_files is not None:
+                max_vector_files_count = -1
+                directory_with_max_vector_files = None
+                for path in directories_with_vector_files.keys():
+                    if not path.endswith(".xcassets"):
+                        if directories_with_vector_files[path] > max_vector_files_count:
+                            max_vector_files_count = directories_with_vector_files[path]
+                            directory_with_max_vector_files = path
+
+                raise AssetsDirNotFoundException(directory_with_max_vector_files)
+
 
 def main(args_to_parse):
     parser = argparse.ArgumentParser(description='Converts raw assets to proper PNG(s).')
     parser.add_argument('-i', '--input_dir', default="./Assets", help='directory with raw assets')
-    parser.add_argument('-f', '--force_convert', default="False", help='should regenerate assets even when they were generated before')
+    parser.add_argument('-f', '--force_convert', default="False",
+                        help='should regenerate assets even when they were generated before')
     parser.add_argument('-o', '--output_dir', default="./GeneratedAssets",
                         help='directory where generated PNG(s) will be stored')
     parsed_args = parser.parse_args(args_to_parse)

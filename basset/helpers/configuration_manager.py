@@ -35,11 +35,11 @@ class ConfigurationManager:
                           config_file_path):
         configuration = BassetConfiguration()
 
-        if not xcassets_dir and not raw_assets and not extract_path and not generated_assets_dir and not merge_with_xcassets and not force_convert and not config_file_path:
+        if not xcassets_dir and not raw_assets and not extract_path and not generated_assets_dir and merge_with_xcassets is None and force_convert is None and not config_file_path:
             raise NoConfigurationProvidedException()
 
         if not config_file_path and (
-                                not xcassets_dir or not raw_assets  or not extract_path or not generated_assets_dir or not merge_with_xcassets or not force_convert):
+                                not xcassets_dir or not raw_assets or not generated_assets_dir or merge_with_xcassets is None or force_convert is None):
             raise NotAllConfigurationParametersPresentException()
 
         if config_file_path:

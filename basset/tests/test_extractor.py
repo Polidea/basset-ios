@@ -40,6 +40,13 @@ class TestExtractor(TestCase):
         extractor.input_dir = os.path.join("non_xcassets_directory_set_test", "assets")
         assert_raises(ExtractDirIsNotXcassetsDirException, extractor.extract)
 
+        extractor = Extractor()
+        extractor.input_dir = os.path.join("non_xcassets_directory_set_test", "assets.xcassets/")
+        try:
+            extractor.extract()
+        except Exception:
+            self.fail("Extract shouldn't throw an exception now")
+
     def test_move_all_assets_to_output_dir_and_delete_from_input(self):
         extractor = Extractor()
         extractor.input_dir = os.path.join(self.resources_path, "extract_test", "Images.xcassets")

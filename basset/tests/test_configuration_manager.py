@@ -1,6 +1,6 @@
-import os
 import shutil
 import tempfile
+
 from unittest import TestCase
 
 from basset.exceptions import *
@@ -83,19 +83,15 @@ class TestConfigurationManager(TestCase):
 
     def test_fail_when_not_all_parameters_are_provided(self):
         wrong_args_sets = (
-            (None, "b", "c", "d", "e", "f"),
-            ("", "b", "c", "d", "e", "f"),
-            ("a", None, "c", "d", "e", "f"),
-            ("a", "", "c", "d", "e", "f"),
-            ("a", "b", None, "d", "e", "f"),
-            ("a", "b", "", "d", "e", "f"),
-            ("a", "b", "c", None, "e", "f"),
-            ("a", "b", "c", "", "e", "f"),
-            ("a", "b", "c", None, "e", "f"),
-            ("a", "b", "c", "", "e", "f"),
-            ("a", "b", "c", "d", None, ""),
-            ("a", "b", "c", "d", "e", ""),
-            ("a", "b", "c", "d", "e", None),
+            (None, "b", "c", False, False, None),
+            ("", "b", "c", False, False, None),
+            ("a", None, "c", False, False, None),
+            ("a", "", "c", False, False, None),
+            ("a", "b", None, False, False, None),
+            ("a", "b", "", False, False, None),
+            ("a", "b", "c", None, False, None),
+            ("a", "b", "c", False, None, None),
+            ("a", None, "c", False, False, "f"),
         )
 
         for wrong_args in wrong_args_sets:

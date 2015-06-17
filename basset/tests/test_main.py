@@ -40,8 +40,8 @@ class TestBasset(TestCase):
         self.assertEqual(basset.merger.default_xcasset_dir, self.sample_xcassets_dir)
         self.assertEqual(basset.merger.source_assets_dir, self.sample_generated_assets_dir)
 
-        self.assertEqual(basset.converter.inputDir, self.sample_raw_assets_dir)
-        self.assertEqual(basset.converter.outputDir, self.sample_generated_assets_dir)
+        self.assertEqual(basset.converter.input_dir, self.sample_raw_assets_dir)
+        self.assertEqual(basset.converter.output_dir, self.sample_generated_assets_dir)
         self.assertEqual(basset.converter.force_convert, self.sample_force_covert)
 
         self.assertEqual(basset.extractor.input_dir, self.sample_extract_path)

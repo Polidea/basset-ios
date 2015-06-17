@@ -26,8 +26,8 @@ class Basset:
         self.merger.source_assets_dir = configuration.generated_assets_dir
         self.merger.default_xcasset_dir = configuration.xcassets_dir
 
-        self.converter.inputDir = configuration.raw_assets
-        self.converter.outputDir = configuration.generated_assets_dir
+        self.converter.input_dir = configuration.raw_assets
+        self.converter.output_dir = configuration.generated_assets_dir
         self.converter.force_convert = configuration.force_convert
 
         self.extractor.input_dir = configuration.extract_path
@@ -49,14 +49,13 @@ def main(args_to_parse):
     main_group = parser.add_argument_group("Main arguments", "Assets converting and merging with xcassets")
     extract_group = parser.add_argument_group("Extract group", "Extracting assets ")
 
-    parser.add_argument('-r', '--raw_assets_dir', default="Resources/Assets",
+    parser.add_argument('-r', '--raw_assets_dir', default="VectorAssets",
                         help='path to directory with raw, vector based graphics')
-
-    main_group.add_argument('-x', '--xcassets_dir', default="Resources/Images.xcassets",
+    main_group.add_argument('-x', '--xcassets_dir', default="Assets.xcassets",
                             help='path to directory with default xcassets directory')
-    main_group.add_argument('-g', '--generated_assets_dir', default="Assets.xcassets",
+    main_group.add_argument('-g', '--generated_assets_dir', default="GeneratedAssets",
                             help='path to directory where generated PNGs will be stored')
-    main_group.add_argument('-f', '--force_convert', default="False",
+    main_group.add_argument('-f', '--force_convert', default=False,
                             help='should regenerate assets even when they were generated before')
     main_group.add_argument('-m', '--merge_with_xcassets', default=True,
                             help='will script process xcassets directories')
