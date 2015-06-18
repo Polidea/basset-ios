@@ -55,32 +55,16 @@ class TestExtractor(TestCase):
         extractor.output_dir = "output"
 
         original_files = []
-        original_files.append(Converter.sha1_of_file(os.path.join(extractor.input_dir, "test-01.imageset", "test-01.png")))
-        original_files.append(Converter.sha1_of_file(os.path.join(extractor.input_dir, "test-01.imageset", "test-01@2x.png")))
-        original_files.append(Converter.sha1_of_file(os.path.join(extractor.input_dir, "test-01.imageset", "test-01@3x.png")))
-
-        original_files.append(Converter.sha1_of_file(os.path.join(extractor.input_dir, "test-02.imageset", "test-02.png")))
-        original_files.append(Converter.sha1_of_file(os.path.join(extractor.input_dir, "test-02.imageset", "test-02@2x.png")))
-        original_files.append(Converter.sha1_of_file(os.path.join(extractor.input_dir, "test-02.imageset", "test-02@3x.png")))
-
-        original_files.append(Converter.sha1_of_file(os.path.join(extractor.input_dir, "folder", "test-03.imageset", "test-03.png")))
-        original_files.append(Converter.sha1_of_file(os.path.join(extractor.input_dir, "folder", "test-03.imageset", "test-03@2x.png")))
-        original_files.append(Converter.sha1_of_file(os.path.join(extractor.input_dir, "folder", "test-03.imageset", "test-03@3x.png")))
+        original_files.append(Converter.sha1_of_file(os.path.join(extractor.input_dir, "test-01.imageset", "test-01.eps")))
+        original_files.append(Converter.sha1_of_file(os.path.join(extractor.input_dir, "test-02.imageset", "test-02.eps")))
+        original_files.append(Converter.sha1_of_file(os.path.join(extractor.input_dir, "folder", "test-03.imageset", "test-03.eps")))
 
         extractor.extract()
 
         output_files = []
-        output_files.append(Converter.sha1_of_file(os.path.join(extractor.output_dir, "test-01.png")))
-        output_files.append(Converter.sha1_of_file(os.path.join(extractor.output_dir, "test-01@2x.png")))
-        output_files.append(Converter.sha1_of_file(os.path.join(extractor.output_dir, "test-01@3x.png")))
-
-        output_files.append(Converter.sha1_of_file(os.path.join(extractor.output_dir, "test-02.png")))
-        output_files.append(Converter.sha1_of_file(os.path.join(extractor.output_dir, "test-02@2x.png")))
-        output_files.append(Converter.sha1_of_file(os.path.join(extractor.output_dir, "test-02@3x.png")))
-
-        output_files.append(Converter.sha1_of_file(os.path.join(extractor.output_dir, "folder", "test-03.png")))
-        output_files.append(Converter.sha1_of_file(os.path.join(extractor.output_dir, "folder", "test-03@2x.png")))
-        output_files.append(Converter.sha1_of_file(os.path.join(extractor.output_dir, "folder", "test-03@3x.png")))
+        output_files.append(Converter.sha1_of_file(os.path.join(extractor.output_dir, "test-01.eps")))
+        output_files.append(Converter.sha1_of_file(os.path.join(extractor.output_dir, "test-02.eps")))
+        output_files.append(Converter.sha1_of_file(os.path.join(extractor.output_dir, "folder", "test-03.eps")))
 
         self.assertFalse(os.path.isdir(os.path.join(extractor.input_dir, "test-01.imageset")))
         self.assertFalse(os.path.isdir(os.path.join(extractor.input_dir, "test-02.imageset")))
