@@ -38,7 +38,7 @@ class AssetsDirContainsImagesetDirectoryException(BassetException):
     def get_message(self):
         return "Found .xcassets directory with an asset inside: '{0}'. \n" \
                "You cannot have existing xcassets inside vector assets directory. You can extract them with:\n" \
-               "basset_ios -e <path_to_xcassets> -r <path_to_vector_assets_dir>" \
+               "basset_ios -e <path_to_xcassets_dir> -r <path_to_vector_assets_dir>" \
                "".format(self.imageset_directory_path)
 
 

@@ -79,10 +79,10 @@ If you'd like to use different settings, you need to provide configuration file,
 
 ```
 # Default xcasset dir
-xcassets_dir: Resources/Images.xcassets
+xcassets_dir: Assets.xcassets
 
 # Where vector images are kept
-raw_assets: Assets
+raw_assets: VectorAssets
 
 # Where generated PNG(s) will be kept
 generated_assets_dir: GeneratedAssets
@@ -106,9 +106,9 @@ basset-ios -c "Assets/config.yml"
 ```
 basset-ios [-h] [-d XCASSETS_DIR] [-a RAW_ASSETS_DIR]
                  [-g GENERATED_ASSETS_DIR] [-m MERGE_WITH_XCASSETS]
-                 [-c CONFIG]
+                 [-c CONFIG] [-e EXTRACT_PATH]
 
-optional arguments:
+arguments:
   -h, --help										show help message and exit
   -x, --xcassets_dir XCASSETS_DIR					path to directory with default xcassets directory
   -r, --raw_assets_dir RAW_ASSETS_DIR				path to directory with raw, vector based graphics
@@ -116,7 +116,20 @@ optional arguments:
   -m, --merge_with_xcassets MERGE_WITH_XCASSETS		will script process xcassets directories
   -f, --force_convert FORCE_CONVERT					should regenerate assets even when they were generated before
   -c, --config CONFIG								path to config file
+  -e, --extract_path EXTRACT_PATH					if set to existing xcassets directory, will extract all assets from it to "raw_assets_dir"
+    
+  
 ```                        
+
+## Extracting assets from existing .xcassets
+
+In case you'd have existing project, with existing .xcassets with PDFs, you can extract them to separate directory, so it could be used in the future.
+
+In order to extract vectors from existing .xcassets directory, you need to run whi command:
+
+```
+basset_ios -e <path_to_xcassets_dir> -r <path_to_vector_assets_dir>
+```
 
 ## Example
 

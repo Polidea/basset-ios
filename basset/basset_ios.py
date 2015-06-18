@@ -47,7 +47,7 @@ def main(args_to_parse):
     parser = argparse.ArgumentParser(description='Converts raw assets to proper PNG(s).')
 
     main_group = parser.add_argument_group("Main arguments", "Assets converting and merging with xcassets")
-    extract_group = parser.add_argument_group("Extract group", "Extracting assets ")
+    extract_group = parser.add_argument_group("Extract arguments", "Extracting assets from existing .xcassets")
 
     parser.add_argument('-r', '--raw_assets_dir', default="VectorAssets",
                         help='path to directory with raw, vector based graphics')
