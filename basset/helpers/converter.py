@@ -5,8 +5,8 @@ import subprocess
 import sys
 import hashlib
 
-from wand.image import Image
 import coloredlogs
+from wand.image import Image
 
 from basset.exceptions import *
 
@@ -31,20 +31,27 @@ class Converter:
                 sha.update(line)
             return sha.hexdigest()
 
-    def convert_single_file(self, source_file, destination_file, target_resolution, scale_factor):
+    def convert_single_file(self, source_file, destination_file, target_resolution, scale_factor, transparent_color):
         sha1_of_original_file = self.sha1_of_file(source_file)
+
+        add_transparency_part = ""
+        if transparent_color:
+            add_transparency_part = "-transparent \"{0}\"".format(transparent_color)
 
         self.converted_files_hashes[destination_file] = sha1_of_original_file
 
         convert_string = "convert " \
                          "-density {0}00% " \
                          "\"{1}\" " \
-                         "-resize {2}x{3} " \
-                         "\"{4}\"".format(scale_factor,
+                         " {2} " \
+                         "-resize {3}x{4} " \
+                         "\"{5}\"".format(scale_factor,
                                           source_file,
+                                          add_transparency_part,
                                           target_resolution[0],
                                           target_resolution[1],
                                           destination_file)
+        logging.info(convert_string)
 
         os.system(convert_string)
 
@@ -59,14 +66,30 @@ class Converter:
         return self.force_convert or destination_file_missing or destination_file_was_generated_from_the_different_file
 
     @staticmethod
-    def size_of_image(path):
-        raw = subprocess.check_output("identify -verbose \"{0}\" | grep Resolution:".format(path),
-                                      shell=True).decode("utf-8")
-        resolution = raw.replace("Resolution::", "").strip(" \t\n\r")
+    def return_first_line_containing_string(lines, match_string):
+        for line in lines.splitlines():
+            if match_string in line:
+                return line
 
+        return None
+
+    @staticmethod
+    def get_image_metadata(path):
+        raw = subprocess.check_output("identify -verbose \"{0}\"".format(path),
+                                      shell=True).decode("utf-8")
+
+        resolution_id = "Geometry:"
+        transparent_color_id = "Transparent color:"
+
+        resolution = Converter.return_first_line_containing_string(raw, resolution_id)
+        resolution = resolution.replace(resolution_id, "").strip(" \t\n\r").split("+")[0]
         resolution_parts = resolution.split("x")
 
-        return resolution_parts[0], resolution_parts[1]
+        transparent_color = Converter.return_first_line_containing_string(raw, transparent_color_id)
+        if transparent_color:
+            transparent_color = transparent_color.replace(transparent_color_id, "").strip(" \t\n\r")
+
+        return (int(resolution_parts[0]), int(resolution_parts[1])), transparent_color
 
     def convert(self):
         self.input_dir = self.input_dir.rstrip('\\/')
@@ -108,8 +131,7 @@ class Converter:
                                 selected_destination_templates.append(template)
 
                         if len(selected_destination_templates) > 0:
-                            with Image(filename=original_full_path) as img:
-                                original_size = img.size
+                            original_size, transparent_color = Converter.get_image_metadata(original_full_path)
 
                             for template in selected_destination_templates:
                                 converted_files_count += 1
@@ -117,11 +139,12 @@ class Converter:
                                 destination_path = os.path.join(new_base_path, basename + template[1])
 
                                 self.convert_single_file(original_full_path, destination_path, new_image_size,
-                                                         template[0])
+                                                         template[0], transparent_color)
                                 logging.info("Converted {0} to {1}".format(original_full_path, destination_path))
 
-        with open(temp_file, "w+") as data_file:
-            json.dump(self.converted_files_hashes, data_file, indent=1)
+        if converted_files_count > 0:
+            with open(temp_file, "w+") as data_file:
+                json.dump(self.converted_files_hashes, data_file, indent=1)
 
         logging.info("Images conversion finished. Processed " + str(converted_files_count) + " images")
 
