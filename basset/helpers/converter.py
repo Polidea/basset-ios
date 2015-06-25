@@ -51,7 +51,6 @@ class Converter:
                                           target_resolution[0],
                                           target_resolution[1],
                                           destination_file)
-        logging.info(convert_string)
 
         os.system(convert_string)
 
@@ -94,6 +93,9 @@ class Converter:
     def convert(self):
         self.input_dir = self.input_dir.rstrip('\\/')
         self.output_dir = self.output_dir.rstrip('\\/')
+
+        self.input_dir = os.path.expandvars(os.path.expanduser(self.input_dir))
+        self.output_dir = os.path.expandvars(os.path.expanduser(self.output_dir))
 
         logging.info("Converting vector files from {0} to {1}".format(self.input_dir, self.output_dir))
 

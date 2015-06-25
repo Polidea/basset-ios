@@ -18,6 +18,10 @@ class Extractor:
     def extract(self):
         self.input_dir = self.input_dir.rstrip('\\/')
         self.output_dir = self.output_dir.rstrip('\\/')
+
+        self.input_dir = os.path.expandvars(os.path.expanduser(self.input_dir))
+        self.output_dir = os.path.expandvars(os.path.expanduser(self.output_dir))
+
         logging.info("Extracting vector files from {0} to {1}".format(self.input_dir, self.output_dir))
 
         if not self.input_dir.endswith(".xcassets"):

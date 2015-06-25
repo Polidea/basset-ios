@@ -41,6 +41,9 @@ class Merger:
         self.source_assets_dir = self.source_assets_dir.rstrip('\\/')
         self.default_xcasset_dir = self.default_xcasset_dir.rstrip('\\/')
 
+        self.source_assets_dir = os.path.expandvars(os.path.expanduser(self.source_assets_dir))
+        self.default_xcasset_dir = os.path.expandvars(os.path.expanduser(self.default_xcasset_dir))
+
         logging.info("Merging assets from {0} using {1} as default xcassets".format(self.source_assets_dir,
                                                                                     self.default_xcasset_dir))
 
@@ -65,7 +68,6 @@ class Merger:
                                                                     asset_name + ".imageset")
                     if not os.path.isdir(asset_dir_in_destination_xcasset):
                         os.makedirs(asset_dir_in_destination_xcasset)
-
 
                     # Create / update JSON file
                     content_json_file_path = os.path.join(asset_dir_in_destination_xcasset, "Contents.json")
