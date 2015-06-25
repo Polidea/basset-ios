@@ -1,6 +1,6 @@
 <img src="./readme_resources/basset_bg.png" alt="basset/>
 
-[![Build Status](https://travis-ci.org/Polidea/basset-ios.svg?branch=master)](https://travis-ci.org/Polidea/basset-ios)
+[![Build Status](https://travis-ci.org/Polidea/basset-ios.svg)](https://travis-ci.org/Polidea/basset-ios)
 
 **Basset** is an image converting and organizing tool, that allows developers to take care of only vector versions of assets used in iOS projects.
 
