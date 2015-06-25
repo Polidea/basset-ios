@@ -1,4 +1,6 @@
-<img src="./readme_resources/basset_bg.png" alt="basset/>
+<p align="center" >
+<img src="./readme_resources/basset_bg.png" alt="basset" title="basset"/>
+</p>
 
 [![Build Status](https://travis-ci.org/Polidea/basset-ios.svg)](https://travis-ci.org/Polidea/basset-ios)
 
