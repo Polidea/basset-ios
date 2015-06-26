@@ -43,6 +43,7 @@ brew install basset_ios
 
 ####Known issues
 
+#### Outdated homebrew version
 in case you've recieved this error:
 
 ```
@@ -50,6 +51,20 @@ Error: undefined method `desc' for ...
 ```
 
 please make sure you've newest version of homebrew. You can update it by running ```brew update``` command
+
+#### El Capitan XCOde issue
+
+If during installation on El Capitan you recieve
+
+```
+error: cannot run C compiled programs
+```
+
+run 
+
+```
+xcode-select —install
+```
 
 ####Docker
 
