@@ -52,7 +52,7 @@ Error: undefined method `desc' for ...
 
 please make sure you've newest version of homebrew. You can update it by running ```brew update``` command
 
-#### El Capitan XCOde issue
+#### El Capitan XCode issue
 
 If during installation on El Capitan you recieve
 
