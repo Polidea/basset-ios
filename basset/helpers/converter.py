@@ -42,6 +42,7 @@ class Converter:
 
         convert_string = "convert " \
                          "-density {0}00% " \
+                         "-background none " \
                          "\"{1}\" " \
                          " {2} " \
                          "-resize {3}x{4} " \
