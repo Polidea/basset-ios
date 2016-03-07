@@ -134,16 +134,19 @@ class Converter:
                                 selected_destination_templates.append(template)
 
                         if len(selected_destination_templates) > 0:
-                            original_size, transparent_color = Converter.get_image_metadata(original_full_path)
+                            try:
+                                original_size, transparent_color = Converter.get_image_metadata(original_full_path)
 
-                            for template in selected_destination_templates:
-                                converted_files_count += 1
-                                new_image_size = (original_size[0] * template[0], original_size[1] * template[0])
-                                destination_path = os.path.join(new_base_path, basename + template[1])
+                                for template in selected_destination_templates:
+                                    new_image_size = (original_size[0] * template[0], original_size[1] * template[0])
+                                    destination_path = os.path.join(new_base_path, basename + template[1])
 
-                                self.convert_single_file(original_full_path, destination_path, new_image_size,
-                                                         template[0], transparent_color)
-                                logging.info("Converted {0} to {1}".format(original_full_path, destination_path))
+                                    self.convert_single_file(original_full_path, destination_path, new_image_size,
+                                                             template[0], transparent_color)
+                                    converted_files_count += 1
+                                    logging.info("Converted {0} to {1}".format(original_full_path, destination_path))
+                            except subprocess.CalledProcessError as error:
+                                logging.error("Error while processing {0}: {1}".format(original_full_path, error))
 
         if converted_files_count > 0:
             with open(temp_file, "w+") as data_file:
