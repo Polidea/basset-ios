@@ -41,6 +41,13 @@ brew tap Polidea/tap
 brew install basset_ios
 ```
 
+In order to upgrade **Basset** type:
+
+```
+brew update
+brew upgrade basset_ios
+```
+
 ####Known issues
 
 #### Outdated homebrew version
@@ -64,12 +71,6 @@ run
 
 ```
 xcode-select —install
-```
-
-####Docker
-
-```
-TBD
 ```
 
 ##Usage
