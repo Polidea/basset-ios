@@ -8,7 +8,7 @@
 
 Main features of **Basset** can be describd in two steps:
 
-1. Converting vector images (.eps, .pdf, .psd, .svg) to PNG(s) with resolutions and names properly recognized by iOS apps (@2x, @3x etc.)
+1. Converting vector images (.svg, .eps, .pdf, .psd) to PNG(s) with resolutions and names properly recognized by iOS apps (@2x, @3x etc.)
 2. Copying assets from previous steps to selected .xcasset files and creating proper JSONs there.
 
 
@@ -48,7 +48,27 @@ brew update
 brew upgrade basset_ios
 ```
 
-####Known issues
+#### Adobe Illustrator save to .SVG options
+
+In order to export assets form Adobe Iloustrator to SVG files that are supported by **Basset**, you need to select "CSS Properties" set as "Style Attributes".
+
+Also keep in mind to convert all fonts in the artboards to outlines (you can also use "Conver to outline" option during saving).
+
+<img src="./readme_resources/illustrator.png" style="width: 400px;"/>
+
+####Troubleshooting
+
+#### Incorrect gradients when using SVG files
+
+In order to convert SVG's to PNG's with correct gradients we're using *librsvg* that is someting incorrectly installed by Homebrew. In order to install **Basset** with *librsvg* you need to:
+
+```
+brew uninstall librsvg
+brew uninstall imagemagick
+brew uninstall basset_ios
+
+brew install basset_ios
+```
 
 #### Outdated homebrew version
 in case you've recieved this error:
@@ -76,6 +96,8 @@ xcode-select —install
 ##Usage
 
 In order to use **Basset** you need to tell which directory you're using to store vector images, where generated PNGs will be store etc. You can do this by following naming convention written below, or by specifying explicit configuration via command line parameters or dedicated configuration file.
+
+SVG is recommended file format for **Basset**.
 
 Remember that you'll have to create .xcassets directory that you want to use **on your own**. If you'll have more than one .xcassets in your project, you'll need to specify which one you want **Basset** to operate on.
 
