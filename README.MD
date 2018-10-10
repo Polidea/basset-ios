@@ -12,15 +12,15 @@ Main features of **Basset** can be describd in two steps:
 2. Copying assets from previous steps to selected .xcasset files and creating proper JSONs there.
 
 
-####Why just don't use XCode's PDF support?
+#### Why just don't use XCode's PDF support?
 
 1. Each PDF what is drag-and-dropped to XCode is assigned to @1x category in xcassets. For each of them you need to drag them again to "All" category, what is really painful when you're using hundreads of images in your projects.
 2. It's easier to manage ordinary directory of assets than .xcassets. You don't have to use XCode to do that. so even non-developers can add resources to the project.
 3. Check of this link: [http://bjango.com/articles/idontusepdfs/](http://bjango.com/articles/idontusepdfs/)
 
-##Getting started
+## Getting started
 
-###Prerequisites
+### Prerequisites
 
 **Basset** requires:
 
@@ -30,9 +30,9 @@ Main features of **Basset** can be describd in two steps:
 It should also work on other Unix-like system, but it wasn't tested there.
 
 
-###Installation
+### Installation
 
-####Homebrew
+#### Homebrew
 
 Open your terminal and type
 
@@ -56,7 +56,7 @@ Also keep in mind to convert all fonts in the artboards to outlines (you can als
 
 <img src="./readme_resources/illustrator.png" style="width: 400px;"/>
 
-####Troubleshooting
+#### Troubleshooting
 
 #### Incorrect gradients when using SVG files
 
@@ -93,7 +93,7 @@ run
 xcode-select —install
 ```
 
-##Usage
+## Usage
 
 In order to use **Basset** you need to tell which directory you're using to store vector images, where generated PNGs will be store etc. You can do this by following naming convention written below, or by specifying explicit configuration via command line parameters or dedicated configuration file.
 
@@ -115,7 +115,7 @@ If you'll follow this convention, you can can run **Basset** in root directory o
 If you'd like to use different settings, you need to provide configuration file, or override default settings in command line.
 
 
-###Config file
+### Config file
 
 ```
 # Default xcasset dir
@@ -142,7 +142,7 @@ You can run **Basset** with configuration file by providing path to it as ```-c`
 basset-ios -c "Assets/config.yml"
 ```
 
-###Command line
+### Command line
 ```
 basset-ios [-h] [-d XCASSETS_DIR] [-a RAW_ASSETS_DIR]
                  [-g GENERATED_ASSETS_DIR] [-m MERGE_WITH_XCASSETS]
@@ -209,5 +209,5 @@ All images are now visible in XCode:
 
 <img src="./readme_resources/4.png" style="width: 600px;"/>
 
-##License
+## License
 Basset-ios is released under a MIT License. See LICENSE file for details.
