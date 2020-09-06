@@ -6,208 +6,201 @@
 
 **Basset** is an image converting and organizing tool, that allows developers to take care of only vector versions of assets used in iOS projects.
 
-Main features of **Basset** can be describd in two steps:
+Main features of **Basset** can be described in two steps:
 
-1. Converting vector images (.svg, .eps, .pdf, .psd) to PNG(s) with resolutions and names properly recognized by iOS apps (@2x, @3x etc.)
+1. Converting vector images (.svg, .eps, .pdf, .psd) to PNG(s) with resolutions and names properly recognized by iOS apps (`@2x`, `@3x`, etc.)
 2. Copying assets from previous steps to selected .xcasset files and creating proper JSONs there.
 
 
-####Why just don't use XCode's PDF support?
+#### Why just don't use Xcode's PDF support?
 
-1. Each PDF what is drag-and-dropped to XCode is assigned to @1x category in xcassets. For each of them you need to drag them again to "All" category, what is really painful when you're using hundreads of images in your projects.
-2. It's easier to manage ordinary directory of assets than .xcassets. You don't have to use XCode to do that. so even non-developers can add resources to the project.
-3. Check of this link: [http://bjango.com/articles/idontusepdfs/](http://bjango.com/articles/idontusepdfs/)
+1. Each PDF that is drag-and-dropped into Xcode is assigned a `@1x` dimension in the xcasset, by default. You need to update each of them to "Single Scale", which's really painful when you're using hundreds of assets in your projects.
+2. It's easier to manage ordinary directory of assets than .xcassets. You don't have to use Xcode to do that. So even non-developers can add resources to the project.
+3. Must-read: [http://bjango.com/articles/idontusepdfs/](http://bjango.com/articles/idontusepdfs/)
 
-##Getting started
+## Getting started
 
-###Prerequisites
+### Prerequisites
 
 **Basset** requires:
 
-* OSX (tested on Yosemite)
-* Homebrew or docker installed 
+* macOS
+* [Homebrew](https://brew.sh)
 
-It should also work on other Unix-like system, but it wasn't tested there.
+It should also work on other [Unix-like](https://en.wikipedia.org/wiki/Unix-like) systems, but it wasn't tested anywhere but macOS Catalina.
 
+### Installation
 
-###Installation
+On your Terminal, run:
 
-####Homebrew
-
-Open your terminal and type
-
-```
+```javascript
 brew tap Polidea/tap
+curl -s https://raw.githubusercontent.com/rogerluan/basset-ios/master/patched_basset_ios.rb > /usr/local/Homebrew/Library/Taps/polidea/homebrew-tap/basset_ios.rb
+brew install imagemagick
 brew install basset_ios
 ```
 
-In order to upgrade **Basset** type:
-
+Add this to your `~/.zshrc` file (or your bash profile file, depending on your shell environment):
+```javascript
+# The last part of the path should be whatever version of imagemagic@6 you have installed. Type in until the imagemagic@6 part and then press Tab to let it auto-complete with the version it has installed.
+export MAGICK_HOME=/usr/local/Cellar/imagemagick@6/6.9.11-28/
 ```
+
+After adding the `export` line, close Terminal and reopen it. Alternatively, you can run that same line as a command in Terminal.
+
+#### Upgrading
+
+To upgrade **Basset**, type:
+
+```javascript
 brew update
 brew upgrade basset_ios
 ```
 
 #### Adobe Illustrator save to .SVG options
 
-In order to export assets form Adobe Iloustrator to SVG files that are supported by **Basset**, you need to select "CSS Properties" set as "Style Attributes".
+In order to export assets form Adobe Illustrator to SVG files that are supported by **Basset**, you need to select "CSS Properties" set as "Style Attributes".
 
-Also keep in mind to convert all fonts in the artboards to outlines (you can also use "Conver to outline" option during saving).
+Also keep in mind to convert all fonts in the artboards to outlines (you can also use "Convert to outline" option during saving).
 
 <img src="./readme_resources/illustrator.png" style="width: 400px;"/>
 
-####Troubleshooting
+#### Troubleshooting
 
 #### Incorrect gradients when using SVG files
 
-In order to convert SVG's to PNG's with correct gradients we're using *librsvg* that is someting incorrectly installed by Homebrew. In order to install **Basset** with *librsvg* you need to:
+In order to convert SVGs with gradients to PNGs, we're using *librsvg*. The problem is that this library installed incorrectly by Homebrew. To fix this, we need to reinstall it:
 
-```
+```javascript
 brew uninstall librsvg
-brew uninstall imagemagick
 brew uninstall basset_ios
-
 brew install basset_ios
 ```
 
-#### Outdated homebrew version
-in case you've recieved this error:
+## Usage
 
-```
-Error: undefined method `desc' for ...
-```
+**Basset** can be used either by passing command line arguments, or by passing a config yaml file.
 
-please make sure you've newest version of homebrew. You can update it by running ```brew update``` command
+SVG is the recommended vector file format for **Basset**.
 
-#### El Capitan XCode issue
+Remember you'll have to create .xcassets directory that you want to use **on your own**, and if you have more than one .xcassets in your project, you'll need to specify which one you want **Basset** to operate on.
 
-If during installation on El Capitan you recieve
+### Config file
 
-```
-error: cannot run C compiled programs
-```
-
-run 
-
-```
-xcode-select —install
-```
-
-##Usage
-
-In order to use **Basset** you need to tell which directory you're using to store vector images, where generated PNGs will be store etc. You can do this by following naming convention written below, or by specifying explicit configuration via command line parameters or dedicated configuration file.
-
-SVG is recommended file format for **Basset**.
-
-Remember that you'll have to create .xcassets directory that you want to use **on your own**. If you'll have more than one .xcassets in your project, you'll need to specify which one you want **Basset** to operate on.
-
-### Naming convention
-
-In order to use **Basset** you need to place:
-
-* All vector images used in the project needs to be stored in ```Resources/Assets``` directory
-* Default *xcassets* directory needs to be in ```Resources/Images.xcassets```
-* Generated PNG(s) will be stored in ```Resources/GeneratedAssets``` directory
-
-
-If you'll follow this convention, you can can run **Basset** in root directory of your iOS project, and all vector images will be processed, and stored in proper xcassets directory.
-
-If you'd like to use different settings, you need to provide configuration file, or override default settings in command line.
-
-
-###Config file
-
-```
-# Default xcasset dir
+```yaml
+# The xcasset directory to operate on.
 xcassets_dir: Assets.xcassets
 
-# Where vector images are kept
+# Where vector images are kept.
 raw_assets: VectorAssets
 
-# Where generated PNG(s) will be kept
+# Where generated PNG(s) will be kept.
 generated_assets_dir: GeneratedAssets
 
-# Should generated PNG(s) be merged to xcassets folder
-merge_with_xcassets: True
+# Whether the script should generated PNG(s) be merged to xcassets folder.
+merge_with_xcassets: true
 
-# Should convert all assets every time
-force_convert: False
+# Whether the script should convert all assets every time.
+force_convert: false
 ```
 
 #### Example
 
-You can run **Basset** with configuration file by providing path to it as ```-c``` parameter, for example:
+You can run **Basset** with configuration file by providing path to it as `-c` parameter, such as:
 
+```javascript
+basset_ios -c "Assets/config.yml"
 ```
-basset-ios -c "Assets/config.yml"
+
+### Command line
+
+```javascript
+usage: basset_ios [-h] [-r RAW_ASSETS_DIR] [-x XCASSETS_DIR]
+                  [-g GENERATED_ASSETS_DIR] [-f FORCE_CONVERT]
+                  [-m MERGE_WITH_XCASSETS] [-e EXTRACT_PATH] [-c CONFIG]
+
+Converts raw assets to proper PNG(s).
+
+optional arguments:
+  -h, --help            Show this help message and exit
+  -r RAW_ASSETS_DIR, --raw_assets_dir RAW_ASSETS_DIR
+                        Path to directory with raw, vector based graphics.
+                        Defaults to `VectorAssets`.
+
+Main arguments:
+  Assets converting and merging with xcassets
+
+  -x XCASSETS_DIR, --xcassets_dir XCASSETS_DIR
+                        Path to directory with default xcassets directory.
+                        Defaults to `Assets.xcassets`.
+  -g GENERATED_ASSETS_DIR, --generated_assets_dir GENERATED_ASSETS_DIR
+                        Path to directory where generated PNGs will be stored.
+                        Defaults to `GeneratedAssets`.
+  -f FORCE_CONVERT, --force_convert FORCE_CONVERT
+                        Whether the script should convert all assets every time.
+                        Defaults to `false`.
+  -m MERGE_WITH_XCASSETS, --merge_with_xcassets MERGE_WITH_XCASSETS
+                        Whether the script should generated PNG(s) be merged to xcassets folder.
+                        Defaults to `true`.
+  -c CONFIG, --config CONFIG
+                        path to config file
+
+Extract arguments:
+  Extracting assets from existing .xcassets
+
+  -e EXTRACT_PATH, --extract_path EXTRACT_PATH
+                        if set to existing xcassets directory, will extract
+                        all assets from it to `raw_assets_dir`
 ```
 
-###Command line
-```
-basset-ios [-h] [-d XCASSETS_DIR] [-a RAW_ASSETS_DIR]
-                 [-g GENERATED_ASSETS_DIR] [-m MERGE_WITH_XCASSETS]
-                 [-c CONFIG] [-e EXTRACT_PATH]
+## Extracting Assets From Existing .xcassets
 
-arguments:
-  -h, --help										show help message and exit
-  -x, --xcassets_dir XCASSETS_DIR					path to directory with default xcassets directory
-  -r, --raw_assets_dir RAW_ASSETS_DIR				path to directory with raw, vector based graphics
-  -g, --generated_assets_dir GENERATED_ASSETS_DIR	path to directory where generated PNGs will be stored
-  -m, --merge_with_xcassets MERGE_WITH_XCASSETS		will script process xcassets directories
-  -f, --force_convert FORCE_CONVERT					should regenerate assets even when they were generated before
-  -c, --config CONFIG								path to config file
-  -e, --extract_path EXTRACT_PATH					if set to existing xcassets directory, will extract all assets from it to "raw_assets_dir"
-    
-  
-```                        
+If you have an existing project with PDFs, you can extract them to a separate directory, making them available for future use. To do that, run:
 
-## Extracting assets from existing .xcassets
-
-In case you'd have existing project, with existing .xcassets with PDFs, you can extract them to separate directory, so it could be used in the future.
-
-In order to extract vectors from existing .xcassets directory, you need to run whi command:
-
-```
+```javascript
 basset_ios -e <path_to_xcassets_dir> -r <path_to_vector_assets_dir>
 ```
 
 ## Example
 
-1) First of all create new iOS project. Make sure it contains *xcassets* folder inside.
+1. First of all create new iOS project. Make sure it contains *xcassets* folder inside.
 
-<img src="./readme_resources/1.png" style="width: 300px;"/>
+<img width="200" src="readme_resources/1.png">
 
-2) Create Assets folder, and put all your vector images in there.
+2. Create Assets folder, and put all your vector images in there.
 
-<img src="./readme_resources/2.png" style="width: 200px;"/>
+<img width="200" src="readme_resources/2.png">
 
-3) Create config file:
+3. Create a `config.yml` file:
 
-```
+```yaml
 xcassets_dir: test_basset/Images.xcassets
 raw_assets: Assets
 generated_assets_dir: GeneratedAssets
-merge_with_xcassets: True
-force_convert: False
-``` 
-
-and save it as config.yml in project root folder:
-
-<img src="./readme_resources/3.png" style="width: 200px;"/>
-
-4) Open terminal, change current directory to your iOS project, and type:
-
+merge_with_xcassets: true
+force_convert: false
 ```
+
+and save it as `config.yml` in project root folder:
+
+<img width="200" src="readme_resources/3.png">
+
+4. Open terminal, change your current directory to your iOS project, and run:
+
+```javascript
 basset_ios -c config.yml
 ```
 
-5) All vector images should be converted to PNGs and put into selected ```xcassets``` folder.
+Done!
 
-<img src="./readme_resources/5.png" style="width: 600px;"/>
+Now all images should be visible in Xcode:
 
-All images are now visible in XCode:
+<img width="600" src="readme_resources/4.png">
 
-<img src="./readme_resources/4.png" style="width: 600px;"/>
+And all vector images should be converted to PNGs and put into the specified `xcassets` folder:
 
-##License
-Basset-ios is released under a MIT License. See LICENSE file for details.
+<img width="600" src="readme_resources/5.png">
+
+## License
+
+**Basset-ios** is released under a MIT License. See LICENSE file for details.
